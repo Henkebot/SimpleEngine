@@ -8,7 +8,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE hPrevInstance, _In
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	Window window("Test", 1280, 720);
-	Render2D render;
+	Render2D render(1280,720);
 
 	Properties2D prop = { };
 
@@ -21,12 +21,17 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE hPrevInstance, _In
 	{
 		window.clear();
 
+		double x, y;
+		window.getMousePosition(x, y);
+		
+
+
 		render.submit(&test);
 		render.submit(&test2);
 		render.submit(&test3);
 		render.submit(&test4);
 
-		render.flush();
+		render.flush(x, y);
 		window.update();
 	}
 	

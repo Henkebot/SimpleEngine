@@ -7,9 +7,12 @@
 class Render2D
 {
 private:
-	std::deque<const Entity2D*> m_RenderQueue;
+	std::deque<Entity2D*> m_RenderQueue;
+	GLfloat m_ScreenWidth;
+	GLfloat m_ScreenHeight;
 public:
-	void submit(const Entity2D* er2D);
-	void flush();
+	Render2D(int width, int height);
+	void submit(Entity2D* er2D);
+	void flush(double x, double y);
 };
 #endif

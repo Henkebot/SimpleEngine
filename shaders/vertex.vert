@@ -2,10 +2,21 @@
 layout(location = 0) in vec4 vPosition;
 layout(location = 1) in vec4 vColor;
 
-out vec4 fColor;
+uniform mat4 Projection;
+uniform mat4 Model;
+uniform vec2 light_pos;
+
+out DATA
+{
+	vec4 position;
+	vec4 color;
+	vec4 lightPos;
+} vs_out;
 
 void main()
 {
-	fColor = vColor;
-	gl_Position = vPosition;
+	vs_out.color = vColor;
+	vs_out.position = Model * vPosition;
+	vs_out.lightPos = vec4(light_pos,-2.0f,1.0f);
+	gl_Position = Projection * vs_out.position;
 }

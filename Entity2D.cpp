@@ -60,6 +60,8 @@ void Entity2D::bind() const
 {
 	glUseProgram(m_Program);
 	// ALL THE UNIFORMS HERE
+	
+
 	glBindVertexArray(m_Vao);
 }
 
@@ -77,6 +79,18 @@ GLenum Entity2D::getMode() const
 GLuint Entity2D::getIndicies() const
 {
 	return m_Indices;
+}
+
+void Entity2D::setUniform2f(const GLchar * name, glm::vec2 vector)
+{
+	GLint location = glGetUniformLocation(m_Program, name);
+	glUniform2fv(location, 1, &vector[0]);
+}
+
+void Entity2D::setUniformMat4(const GLchar * name, glm::mat4 matrix)
+{
+	GLint location = glGetUniformLocation(m_Program, name);
+	glUniformMatrix4fv(location, 1, GL_FALSE, &matrix[0][0]);
 }
 
 bool Entity2D::init(ShaderInfo* shaders, const VertexData& vert)

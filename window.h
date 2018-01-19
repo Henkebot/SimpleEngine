@@ -15,7 +15,12 @@ class Window
 private:
 	int m_Width;
 	int m_Height;
+
 	const char* m_Title;
+
+	double mouseX;
+	double mouseY;
+
 	GLFWwindow* m_pWindow;
 public:
 	Window(const char* title, int width, int height);
@@ -24,12 +29,15 @@ public:
 	
 	void clear() const;
 	void update() const;
+	void getMousePosition(double& x, double& y);
 	virtual ~Window();
 private:
 	bool init();
+	friend static void resize_callback(GLFWwindow* window, int width, int height);
+	friend static void cursor_position_callback(GLFWwindow* window, double xPos, double yPos);
 	
 };
 // Not possible in class because of "this pointer"
-void resize_callback(GLFWwindow* window, int width, int height);
+
 
 #endif

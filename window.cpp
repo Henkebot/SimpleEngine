@@ -25,6 +25,12 @@ void Window::update() const
 	glfwSwapBuffers(m_pWindow);
 }
 
+void Window::getMousePosition(double & x, double & y)
+{
+	x = mouseX;
+	y = mouseY;
+}
+
 Window::~Window()
 {
 	//glfwDestroyWindow(m_pWindow);
@@ -34,6 +40,15 @@ Window::~Window()
 void resize_callback(GLFWwindow * window, int width, int height) 
 {
 	glViewport(0, 0, width, height);
+}
+
+void cursor_position_callback(GLFWwindow* window, double xPos, double yPos)
+{
+	Window* win = (Window*)glfwGetWindowUserPointer(window);
+	
+	win->mouseX = xPos;
+	win->mouseY = yPos;
+
 }
 
 bool Window::init()
@@ -60,7 +75,9 @@ bool Window::init()
 	}
 
 	glfwMakeContextCurrent(m_pWindow);
+	glfwSetWindowUserPointer(m_pWindow, this);
 	glfwSetWindowSizeCallback(m_pWindow, resize_callback);
+	glfwSetCursorPosCallback(m_pWindow, cursor_position_callback);
 
 	// GLFW INIT COMPLETE FROM THIS POINT
 	if (glewInit() != GLEW_OK)
