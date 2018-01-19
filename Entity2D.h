@@ -12,6 +12,7 @@ struct Properties2D
 	glm::vec2 position;
 	glm::vec2 rotation;
 	glm::vec2 size;
+	glm::vec3 color;
 };
 
 struct VertexData

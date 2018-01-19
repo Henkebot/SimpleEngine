@@ -10,43 +10,22 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE hPrevInstance, _In
 	Window window("Test", 1280, 720);
 	Render2D render;
 
-	static const GLfloat cube_positions[] =
-	{
-		-1.0f, -1.0f, 0.0f, 1.0f,
-		1.0f, -1.0f, 0.0f, 1.0f,
-		-1.0f,  1.0f, 0.0f, 1.0f,
-		-1.0f, -1.0f, 0.0f, 1.0f,
-	};
-
-	static const GLfloat cube_colors[] =
-	{
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 1.0f,
-		0.0f, 1.0f, 1.0f, 1.0f,
-	};
-
-	static const GLushort cube_indices[] =
-	{
-		0, 1, 2
-	};
-
-	VertexData data =
-	{
-		cube_positions, sizeof(cube_positions),
-		cube_colors, sizeof(cube_colors),
-		cube_indices, sizeof(cube_indices),
-		GL_TRIANGLES
-	};
-
 	Properties2D prop = { };
 
-	Entity2D test(prop);
+	Entity2D test({glm::vec2(0,0), glm::vec2(0,0), glm::vec2(0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f)});
+	Entity2D test2({ glm::vec2(0,0), glm::vec2(0,0), glm::vec2(-0.5f, -0.5f), glm::vec3(0.2f, 0.2f, 0.2f) });
+	Entity2D test3({ glm::vec2(0,0), glm::vec2(0,0), glm::vec2(0.5f, -0.5f), glm::vec3(0.7f, 0.7f, 0.7f) });
+	Entity2D test4({ glm::vec2(0,0), glm::vec2(0,0), glm::vec2(-0.5f, 0.5f), glm::vec3(0.9f, 0.9f, 0.9f) });
 
 	while (window.closed())
 	{
 		window.clear();
+
 		render.submit(&test);
+		render.submit(&test2);
+		render.submit(&test3);
+		render.submit(&test4);
+
 		render.flush();
 		window.update();
 	}

@@ -10,11 +10,40 @@ Entity2D::Entity2D(Properties2D properties)
 		{ GL_NONE, NULL }
 	};
 
-	m_Program = loadShaders(shaders);
-	
-	//Remove comment if fuck up
-	//glUseProgram(m_Program);
+	const GLfloat vertices[] =
+	{
+		0.0f				, 0.0f				, 0.0f, 1.0f,
+		properties.size.x	, 0.0f				, 0.0f, 1.0f,
+		properties.size.x	, properties.size.y	, 0.0f, 1.0f,
+		0.0f				, properties.size.y	, 0.0f, 1.0f
+	};
 
+	const GLfloat colors[] =
+	{
+		properties.color.r, properties.color.g, properties.color.b, 1.0f,
+		properties.color.r, properties.color.g, properties.color.b, 1.0f,
+		properties.color.r, properties.color.g, properties.color.b, 1.0f,
+		properties.color.r, properties.color.g, properties.color.b, 1.0f
+	};
+
+	static const GLushort indicies[] =
+	{
+		0, 1, 2, 
+		2, 3, 0
+	};
+
+	VertexData data = 
+	{
+		vertices, sizeof(vertices),
+		colors, sizeof(colors),
+		indicies, sizeof(indicies),
+		GL_TRIANGLES, 6
+	};
+
+	m_Mode = GL_TRIANGLES;
+	m_Indices = 6;
+
+	init(shaders, data);
 }
 
 Entity2D::Entity2D(ShaderInfo* shaders, VertexData vert, Properties2D prop)
@@ -88,7 +117,8 @@ bool Entity2D::init(ShaderInfo* shaders, const VertexData& vert)
 		}
 
 	}
-	//glBindVertexArray(0);
+	glBindVertexArray(0);
 
 	return true;
 }
+
