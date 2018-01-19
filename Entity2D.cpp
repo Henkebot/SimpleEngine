@@ -1,6 +1,6 @@
 #include "Entity2D.h"
 
-Entity2D::Entity2D(Properties2D properties)
+RenderObject2D::RenderObject2D(Properties2D properties)
 	: m_Properties(properties)
 {
 	ShaderInfo shaders[] = 
@@ -46,7 +46,7 @@ Entity2D::Entity2D(Properties2D properties)
 	init(shaders, data);
 }
 
-Entity2D::Entity2D(ShaderInfo* shaders, VertexData vert, Properties2D prop)
+RenderObject2D::RenderObject2D(ShaderInfo* shaders, VertexData vert, Properties2D prop)
 	: m_Properties(prop), m_Mode(vert.mode)
 {
 	if (init(shaders, vert))
@@ -56,44 +56,68 @@ Entity2D::Entity2D(ShaderInfo* shaders, VertexData vert, Properties2D prop)
 
 }
 
-void Entity2D::bind() const
+void RenderObject2D::prepare() const
 {
 	glUseProgram(m_Program);
 	// ALL THE UNIFORMS HERE
-	
+	for (Uniform uni : m_Uniforms)
+	{
+		GLint location = glGetUniformLocation(m_Program, uni.name);
+		switch (uni.type)
+		{
+		case Vec2:
+			{
+				glUniform2fv(location, 1, &uni.vec2[0]);
+			}break;
+		case Mat4:
+			{
+				glUniformMatrix4fv(location, 1, GL_FALSE, &uni.mat4[0][0]);
+			}break;
+		}
+	}
 
 	glBindVertexArray(m_Vao);
 }
 
-void Entity2D::unbind() const
+void RenderObject2D::unbind()
 {
 	glUseProgram(0);
 	glBindVertexArray(0);
+	
+	m_Uniforms.clear();
 }
 
-GLenum Entity2D::getMode() const
+GLenum RenderObject2D::getMode() const
 {
 	return m_Mode;
 }
 
-GLuint Entity2D::getIndicies() const
+GLuint RenderObject2D::getIndicies() const
 {
 	return m_Indices;
 }
 
-void Entity2D::setUniform2f(const GLchar * name, glm::vec2 vector)
+void RenderObject2D::setUniform2f(const GLchar * name, glm::vec2 vector)
 {
-	GLint location = glGetUniformLocation(m_Program, name);
-	glUniform2fv(location, 1, &vector[0]);
+	Uniform uni;
+	uni.type = Vec2;
+	uni.vec2 = vector;
+	uni.name = name;
+
+	m_Uniforms.push_back(uni);
 }
 
-void Entity2D::setUniformMat4(const GLchar * name, glm::mat4 matrix)
+void RenderObject2D::setUniformMat4(const GLchar * name, glm::mat4 matrix)
 {
-	GLint location = glGetUniformLocation(m_Program, name);
-	glUniformMatrix4fv(location, 1, GL_FALSE, &matrix[0][0]);
+	Uniform uni;
+	uni.type = Mat4;
+	uni.mat4 = matrix;
+	uni.name = name;
+
+	m_Uniforms.push_back(uni);
 }
 
-bool Entity2D::init(ShaderInfo* shaders, const VertexData& vert)
+bool RenderObject2D::init(ShaderInfo* shaders, const VertexData& vert)
 {
 	m_Program = loadShaders(shaders);
 	

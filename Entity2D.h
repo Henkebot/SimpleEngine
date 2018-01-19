@@ -7,6 +7,7 @@
 #include <gtx\transform.hpp>
 #include <GL\glew.h>
 #include "Shader.h"
+#include <vector>
 
 #define BUFFER_OFFSET(a) ((void*)(a))
 
@@ -30,8 +31,21 @@ struct VertexData
 	const GLenum mode;
 	const GLuint indices;
 };
+enum UniformType
+{
+	Vec2,
+	Mat4
+};
 
-class Entity2D
+struct Uniform
+{
+	UniformType type;
+	const GLchar* name;
+	glm::vec2 vec2;
+	glm::mat4 mat4;
+};
+
+class RenderObject2D
 {
 private:
 	Properties2D m_Properties;
@@ -40,9 +54,11 @@ private:
 	GLuint m_Vao;
 	GLenum m_Mode;
 	GLuint m_Indices;
+
+	std::vector<Uniform> m_Uniforms;
 public:
-	Entity2D(Properties2D properties);
-	Entity2D(ShaderInfo* shaders, VertexData vert, Properties2D prop);
+	RenderObject2D(Properties2D properties);
+	RenderObject2D(ShaderInfo* shaders, VertexData vert, Properties2D prop);
 	
 	GLenum getMode() const;
 	GLuint getIndicies() const;
@@ -50,8 +66,8 @@ public:
 	void setUniform2f(const GLchar* name, glm::vec2 vector);
 	void setUniformMat4(const GLchar* name, glm::mat4 matrix);
 
-	void bind() const;
-	void unbind() const;
+	void prepare() const;
+	void unbind();
 private:
 	bool init(ShaderInfo* shaders, const VertexData& vert);
 };
