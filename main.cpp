@@ -35,7 +35,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE hPrevInstance, _In
 		
 		
 		//square->setUniform2f("light_pos", glm::vec2((float)((x / 1280.0f) * 2.0f - 1.0f), (float)(1.0f - (y / 720.0f) * 2.0f)));
-		x = (x / 1280.0f) * 2.0f - 1.0f;
+		x = ((x / 1280.0f) * 2.0f - 1.0f) * aspect;
 		y = 1.0f - ((y / 720.0f) * 2.0f);
 		//std::cout << "\rX: " << x << "Y : " << y << "\n";
 		square->setUniform2f("light_pos", glm::vec2((float)(x), (float)(y)));
