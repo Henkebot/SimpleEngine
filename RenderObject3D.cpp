@@ -1,7 +1,7 @@
 #include "RenderObject3D.h"
 
 RenderObject3D::RenderObject3D(const glm::vec3 & position, const glm::vec3 & size, const glm::vec3& color)
-	:m_Position(position), m_Size(size), m_Color(color), m_Rotation(glm::mat4(1)), m_Translation(glm::translate(position))
+	:m_Position(position), m_Color(color), m_Rotation(glm::mat4(1)), m_Translation(glm::translate(position))
 {
 	ShaderInfo shaders[] =
 	{
@@ -64,6 +64,9 @@ RenderObject3D::RenderObject3D(const glm::vec3 & position, const glm::vec3 & siz
 		GL_TRIANGLES, (6*6)
 	};
 
+	m_Size = glm::scale(glm::mat4(1), size);
+	translate(m_Position);
+
 	RenderObject::init(shaders, data);
 }
 
@@ -71,20 +74,25 @@ void RenderObject3D::updateUniforms()
 {
 	setUniformMat4("World", m_Translation);
 	setUniformMat4("World", m_Rotation);
+	setUniformMat4("World", m_Size);
 }
 
 glm::vec3 RenderObject3D::getPos3fv() const
 {
-	return m_Position;
+	glm::vec4 result = m_Translation * m_Rotation *  m_Size * glm::vec4(m_Position,1.0f);
+	return glm::vec3(result.x,result.y,result.z);
 }
 
 void RenderObject3D::rotate(float angle, const glm::vec3 & axis)
 {
 	m_Rotation = glm::rotate(angle, axis);
+	glm::vec4 result = m_Rotation * glm::vec4(m_Position, 1.0f);
+	//m_Position = glm::vec3(result.x, result.y, result.z);
 }
 
 void RenderObject3D::translate(const glm::vec3 & vector)
 {
-	m_Position += vector;
 	m_Translation = glm::translate(vector);
+	glm::vec4 result = m_Translation * glm::vec4(m_Position, 1.0f);
+	//m_Position = glm::vec3(result.x, result.y, result.z);
 }

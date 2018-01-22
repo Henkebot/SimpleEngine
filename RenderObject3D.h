@@ -11,7 +11,7 @@ private:
 	glm::mat4 m_Translation;
 
 	glm::mat4 m_Rotation;
-	glm::vec3 m_Size;
+	glm::mat4 m_Size;
 	glm::vec3 m_Color;
 public:
 	RenderObject3D(const glm::vec3& position = glm::vec3(0.0f, 0.0f, 0.0f),

@@ -82,8 +82,6 @@ void Camera::update(double xMouse, double yMouse)
 	front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 	m_Target = glm::normalize(front);
 
-	std::cout << "\rm_Yaw: " << m_Yaw << " pitch: " << m_Pitch << std::flush;
-
 }
 
 void Camera::Init()
