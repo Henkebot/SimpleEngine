@@ -7,8 +7,8 @@ RenderObject2D::RenderObject2D(const glm::vec2 & position, const glm::vec2 & siz
 	ShaderInfo shaders[] =
 	{
 		{ GL_VERTEX_SHADER, "shaders/vertex.vert" },
-	{ GL_FRAGMENT_SHADER, "shaders/fragment.frag" },
-	{ GL_NONE, NULL }
+		{ GL_FRAGMENT_SHADER, "shaders/fragment.frag" },
+		{ GL_NONE, NULL }
 	};
 
 	const GLfloat vertices[] =

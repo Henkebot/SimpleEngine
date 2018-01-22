@@ -2,8 +2,11 @@
 #define RENDER_OBJECT_H
 
 #include "Shader.h"
-#include <glm.hpp>
 #include <vector>
+#include <glm.hpp>
+#include <gtc\matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <gtx\transform.hpp>
 #include <gl\glew.h>
 
 #define BUFFER_OFFSET(a) ((void*)(a))

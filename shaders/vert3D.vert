@@ -18,7 +18,6 @@ void main()
 {
 	vs_out.color = vColor;
 	vs_out.position = World * vPosition;
-	vs_out.lightPos = vec4(light_pos,0.0f,1.0f);
-
+	vs_out.lightPos = vec4(light_pos, -2.0f ,1.0f);
 	gl_Position = Projection * vs_out.position;
 }

@@ -1,10 +1,7 @@
 #ifndef ENTITY_2D
 #define ENTITY_2D
 
-#include <glm.hpp>
-#include <gtc\matrix_transform.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <gtx\transform.hpp>
+
 #include <GL\glew.h>
 #include "Shader.h"
 #include <vector>
