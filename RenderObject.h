@@ -1,23 +1,12 @@
-#ifndef ENTITY_2D
-#define ENTITY_2D
+#ifndef RENDER_OBJECT_H
+#define RENDER_OBJECT_H
 
-#include <glm.hpp>
-#include <gtc\matrix_transform.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <gtx\transform.hpp>
-#include <GL\glew.h>
 #include "Shader.h"
+#include <glm.hpp>
 #include <vector>
+#include <gl\glew.h>
 
 #define BUFFER_OFFSET(a) ((void*)(a))
-
-struct Properties2D
-{
-	glm::vec2 position;
-	glm::vec2 rotation;
-	glm::vec2 size;
-	glm::vec3 color;
-};
 
 struct VertexData
 {
@@ -27,11 +16,11 @@ struct VertexData
 	const GLsizei vcSize;
 	const GLushort* eIndices;
 	const GLsizei viSize;
-	
+
 	const GLenum mode;
 	const GLuint indices;
 };
-enum UniformType
+enum UniformType : unsigned char
 {
 	Vec2,
 	Mat4
@@ -45,11 +34,10 @@ struct Uniform
 	glm::mat4 mat4;
 };
 
-class RenderObject2D
+
+class RenderObject
 {
 private:
-	Properties2D m_Properties;
-
 	GLint m_Program;
 	GLuint m_Vao;
 	GLenum m_Mode;
@@ -57,18 +45,21 @@ private:
 
 	std::vector<Uniform> m_Uniforms;
 public:
-	RenderObject2D(Properties2D properties);
-	RenderObject2D(ShaderInfo* shaders, VertexData vert, Properties2D prop);
-	
+
 	GLenum getMode() const;
 	GLuint getIndicies() const;
-	
+
 	void setUniform2f(const GLchar* name, glm::vec2 vector);
 	void setUniformMat4(const GLchar* name, glm::mat4 matrix);
 
-	void prepare() const;
+	virtual void updateUniforms() = 0;
+
+	void prepare();
 	void unbind();
-private:
+
+protected:
 	bool init(ShaderInfo* shaders, const VertexData& vert);
 };
-#endif
+
+#endif // !RENDER_OBJECT_H
+

@@ -1,6 +1,6 @@
 #include "Render2D.h"
 
-void Render2D::submit(RenderObject2D * er2D)
+void Render2D::submit(RenderObject * er2D)
 {
 	m_RenderQueue.push_back(er2D);
 }
@@ -9,7 +9,7 @@ void Render2D::flush()
 {
 	while (!m_RenderQueue.empty())
 	{
-		RenderObject2D* er2D = m_RenderQueue.front();
+		RenderObject* er2D = m_RenderQueue.front();
 		
 		er2D->prepare();
 		{

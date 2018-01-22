@@ -1,9 +1,10 @@
 #version 440
+#pragma optimize(off)
 layout(location = 0) in vec4 vPosition;
 layout(location = 1) in vec4 vColor;
 
 uniform mat4 Projection;
-uniform mat4 Model;
+uniform mat4 World;
 uniform vec2 light_pos;
 
 out DATA
@@ -16,7 +17,7 @@ out DATA
 void main()
 {
 	vs_out.color = vColor;
-	vs_out.position = Model * vPosition;
-	vs_out.lightPos = vec4(light_pos,-2.0f,1.0f);
+	vs_out.position = World * vPosition;
+	vs_out.lightPos = vec4(light_pos,0.0f,1.0f);
 	gl_Position = Projection * vs_out.position;
 }

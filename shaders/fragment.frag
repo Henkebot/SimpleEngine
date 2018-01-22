@@ -1,4 +1,7 @@
+
 #version 440
+#pragma optimize(off)
+
 layout (location = 0) out vec4 outColor;
 
 in DATA
@@ -8,8 +11,11 @@ in DATA
 	vec4 lightPos;
 } fs_in;
 
+
 void main()
 {
-	float intensity = 1.0 / length(fs_in.position.xyz - fs_in.lightPos.xyz);
-	outColor = fs_in.color * intensity;
+	float intensity = 1.0 / length(fs_in.position.xy - fs_in.lightPos.xy);
+	vec3 finalColor = fs_in.color.rgb * intensity;
+	outColor = vec4(finalColor,1.0);
+	//outColor = fs_in.position;
 }
