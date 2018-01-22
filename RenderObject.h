@@ -26,6 +26,7 @@ struct VertexData
 enum UniformType : unsigned char
 {
 	Vec2,
+	Vec3,
 	Mat4
 };
 
@@ -33,6 +34,7 @@ struct Uniform
 {
 	UniformType type;
 	const GLchar* name;
+	glm::vec3 vec3;
 	glm::vec2 vec2;
 	glm::mat4 mat4;
 };
@@ -53,9 +55,15 @@ public:
 	GLuint getIndicies() const;
 
 	void setUniform2f(const GLchar* name, glm::vec2 vector);
+	void setUniform3f(const GLchar* name, glm::vec3 vector);
 	void setUniformMat4(const GLchar* name, glm::mat4 matrix);
 
 	virtual void updateUniforms() = 0;
+
+	virtual glm::vec3 getPos3fv() const;
+
+	virtual void rotate(float angle, const glm::vec3& axis);
+	virtual void translate(const glm::vec3& vector);
 
 	void prepare();
 	void unbind();

@@ -12,7 +12,7 @@ in DATA
 
 void main()
 {
-	float intensity = 1.0/length(fs_in.position.xy - fs_in.lightPos.xy);
+	float intensity = 1.0/length(fs_in.position.xyz - fs_in.lightPos.xyz);
 
 	vec3 finalColor = clamp(fs_in.color.rgb * intensity, 0.0f, 1.0f);
 	outColor = vec4(finalColor,1.0f);

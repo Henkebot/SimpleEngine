@@ -1,7 +1,7 @@
 #include "RenderObject3D.h"
 
-RenderObject3D::RenderObject3D(const glm::vec3 & position, const glm::vec3 & size, const glm::vec3 & rotation, const glm::vec3& color)
-	:m_Position(position), m_Size(size), m_Rotation(rotation), m_Color(color)
+RenderObject3D::RenderObject3D(const glm::vec3 & position, const glm::vec3 & size, const glm::vec3& color)
+	:m_Position(position), m_Size(size), m_Color(color), m_Rotation(glm::mat4(1)), m_Translation(glm::translate(position))
 {
 	ShaderInfo shaders[] =
 	{
@@ -69,9 +69,22 @@ RenderObject3D::RenderObject3D(const glm::vec3 & position, const glm::vec3 & siz
 
 void RenderObject3D::updateUniforms()
 {
-	static float test = 0.0f;
-	test += 0.01f;
-	glm::mat4 worldMatrix = glm::translate(glm::vec3(m_Position.x, m_Position.y, m_Position.z));
-	glm::mat4 worldMatrixZ = glm::rotate(test, glm::vec3(0, 1, 0));
-	setUniformMat4("World", worldMatrix * worldMatrixZ);
+	setUniformMat4("World", m_Translation);
+	setUniformMat4("World", m_Rotation);
+}
+
+glm::vec3 RenderObject3D::getPos3fv() const
+{
+	return m_Position;
+}
+
+void RenderObject3D::rotate(float angle, const glm::vec3 & axis)
+{
+	m_Rotation = glm::rotate(angle, axis);
+}
+
+void RenderObject3D::translate(const glm::vec3 & vector)
+{
+	m_Position += vector;
+	m_Translation = glm::translate(vector);
 }

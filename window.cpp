@@ -21,6 +21,7 @@ void Window::clear() const
 
 void Window::update() const
 {
+//	glfwSetCursorPos(m_pWindow, double(m_Width) / 2.0, double(m_Height) / 2.0);
 	glfwPollEvents();
 	glfwSwapBuffers(m_pWindow);
 }
@@ -78,6 +79,8 @@ bool Window::init()
 	glfwSetWindowUserPointer(m_pWindow, this);
 	glfwSetWindowSizeCallback(m_pWindow, resize_callback);
 	glfwSetCursorPosCallback(m_pWindow, cursor_position_callback);
+
+	glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// GLFW INIT COMPLETE FROM THIS POINT
 	if (glewInit() != GLEW_OK)

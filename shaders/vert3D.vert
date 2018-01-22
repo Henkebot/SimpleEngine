@@ -5,6 +5,7 @@ layout(location = 1) in vec4 vColor;
 
 uniform mat4 Projection;
 uniform mat4 World;
+uniform mat4 View;
 uniform vec2 light_pos;
 
 out DATA
@@ -19,5 +20,5 @@ void main()
 	vs_out.color = vColor;
 	vs_out.position = World * vPosition;
 	vs_out.lightPos = vec4(light_pos, -2.0f ,1.0f);
-	gl_Position = Projection * vs_out.position;
+	gl_Position = Projection * View * vs_out.position;
 }
