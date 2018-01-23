@@ -26,23 +26,23 @@ RenderObject3D::RenderObject3D(const glm::vec3 & position, const glm::vec3 & siz
 
 	const GLushort indicies[] =
 	{
-		0, 1, 2,
+		0, 1, 2, 
 		2, 3, 0,
 
-		1, 5, 4,
+		5, 1, 0,
+		0, 7, 5,
+
 		4, 2, 1,
+		1, 5, 4,
 
-		2, 4, 6,
 		6, 3, 2,
+		2, 4, 6,
 
-		1, 5, 7,
-		7, 0, 1,
+		5, 7, 6,
+		6, 4, 5,
 
-		3, 0, 6,
-		6, 7, 0,
-
-		4, 5, 7,
-		7, 6, 4
+		7, 0, 3,
+		3, 6, 7
 	};
 
 	const GLfloat colors[] =
@@ -80,13 +80,13 @@ void RenderObject3D::updateUniforms()
 
 glm::vec3 RenderObject3D::getPos3fv() const
 {
-	glm::vec4 result = m_Translation * m_Rotation *  m_Size * glm::vec4(m_Position,1.0f);
+	glm::vec4 result = m_Translation *  m_Size * m_Rotation * glm::vec4(m_Position,1.0f);
 	return glm::vec3(result.x,result.y,result.z);
 }
 
 void RenderObject3D::rotate(float angle, const glm::vec3 & axis)
 {
-	m_Rotation = glm::rotate(angle, axis);
+	m_Rotation = glm::rotate(angle, axis) *  m_Translation;
 	glm::vec4 result = m_Rotation * glm::vec4(m_Position, 1.0f);
 	//m_Position = glm::vec3(result.x, result.y, result.z);
 }

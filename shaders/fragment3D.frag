@@ -3,6 +3,8 @@
 
 layout(location = 0) out vec4 outColor;
 
+uniform vec3 ViewPos;
+
 in DATA
 {
 	vec4 position;
@@ -13,10 +15,23 @@ in DATA
 
 void main()
 {
-	float intensity = abs(3.0/length(fs_in.position.xyz - fs_in.lightPos.xyz));
-	
+	float specularStrength = 0.5;
 
-	vec3 finalColor = clamp(fs_in.color.rgb * intensity, 0.0f, 1.0f);
-	vec3 normalColor = abs(fs_in.normal.xyz);
-	outColor = vec4(normalColor,1.0f);
+	float ambientStrength = 0.1f;
+	vec3 ambient = vec3(1.0, 1.0,1.0) * ambientStrength;
+
+	vec3 lightUnitVector = normalize(fs_in.lightPos.xyz - fs_in.position.xyz);
+
+	vec3 viewDir = normalize(ViewPos - fs_in.position.xyz);
+	vec3 reflectDir = reflect(-lightUnitVector, fs_in.normal.xyz);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+	
+	vec3 specular = vec3(1.0, 1.0, 1.0) * specularStrength * spec;
+
+	float diffuse = max(dot(fs_in.normal.xyz, lightUnitVector),0.0);
+	float intensity = 1.0/length(fs_in.position.xyz - fs_in.lightPos.xyz);
+
+	vec3 finalColor = clamp(fs_in.color.rgb * (ambient + diffuse + specular) * intensity, 0.0f, 1.0f);
+
+	outColor = vec4(finalColor,1.0f);
 }

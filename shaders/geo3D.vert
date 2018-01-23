@@ -28,17 +28,17 @@ void main()
 	int i;
 	for(i = 0; i < gl_in.length();i++)
 	{
-
 		geo_out.position = vertices[i].position;
 		geo_out.color = vertices[i].color;
-
-
+		geo_out.lightPos = vertices[i].lightPos;
+		
+		// Calculate normal
 		vec4 pos[3] = vec4[](gl_in[0].gl_Position, gl_in[1].gl_Position, gl_in[2].gl_Position);
 		vec3 normal = vec3( cross( pos[1].xyz-pos[0].xyz , pos[2].xyz-pos[0].xyz ));
 
 		geo_out.normal = vec4(normalize(normal),1.0f);
 
-		gl_Position = Projection * View * pos[i];
+		gl_Position = Projection * View *vertices[i].position;
 
 		EmitVertex();
 	}
