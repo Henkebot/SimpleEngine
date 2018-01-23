@@ -127,6 +127,7 @@ bool RenderObject::init(ShaderInfo * shaders, const VertexData & vert)
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		{
 			glBufferData(GL_ARRAY_BUFFER, vert.vpSize + vert.vcSize, NULL, GL_STATIC_DRAW);
+
 			glBufferSubData(GL_ARRAY_BUFFER, 0, vert.vpSize, vert.vPositions);
 			glBufferSubData(GL_ARRAY_BUFFER, vert.vpSize, vert.vcSize, vert.vColors);
 

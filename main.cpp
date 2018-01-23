@@ -18,7 +18,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_ HINSTANCE hPrevInstance, _In
 	Window window("Test", WIDTH, HEIGHT);
 	Render2D render;
 
-	Camera camera(WIDTH, HEIGHT,glm::vec3(0,0,3), glm::vec3(1, 0, 1));
+	Camera camera(WIDTH, HEIGHT,glm::vec3(0,0,3), glm::vec3(0, 0, 1));
 
 	//RenderObject2D test({glm::vec2(-1.0f,0), glm::vec2(0,0), glm::vec2(0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f)});
 	//RenderObject* square = new RenderObject2D(glm::vec2(-1.0f, -1.0f), glm::vec2(2.0f,2.0f));

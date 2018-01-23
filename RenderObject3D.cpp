@@ -6,6 +6,7 @@ RenderObject3D::RenderObject3D(const glm::vec3 & position, const glm::vec3 & siz
 	ShaderInfo shaders[] =
 	{
 		{ GL_VERTEX_SHADER, "shaders/vert3D.vert" },
+		{ GL_GEOMETRY_SHADER, "shaders/geo3D.vert" },
 		{ GL_FRAGMENT_SHADER, "shaders/fragment3D.frag" },
 		{ GL_NONE, NULL }
 	};
