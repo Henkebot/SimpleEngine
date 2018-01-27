@@ -14,6 +14,7 @@ public:
 	~IndexBuffer();
 	
 	void bind();
+	void unbind();
 
 	GLuint getIndices() const;
 };

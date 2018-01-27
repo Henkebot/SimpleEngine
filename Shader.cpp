@@ -28,7 +28,8 @@ GLuint Shader::loadShaders(ShaderInfo * shaders)
 {
 	if (shaders == nullptr) return 0;
 
-	GLuint program = glCreateProgram();
+	GLuint program; 
+	GLCall(program = glCreateProgram());
 
 	ShaderInfo* entry = shaders;
 
@@ -40,13 +41,13 @@ GLuint Shader::loadShaders(ShaderInfo * shaders)
 		const GLchar* shaderSource = readShader(entry->fileName);
 		if (shaderSource == nullptr)
 		{
-			glDeleteShader(entry->shader);
+			GLCall(glDeleteShader(entry->shader));
 			entry->shader = 0;
 			// Error notified in readShader()
 			// Clear all the shaders since an error occured
 			for (entry = shaders; entry->type != GL_NONE; entry++)
 			{
-				glDeleteShader(entry->shader);
+				GLCall(glDeleteShader(entry->shader));
 				entry->shader = 0;
 			}
 
@@ -115,19 +116,32 @@ Shader::Shader(ShaderInfo * shaders)
 
 Shader::~Shader()
 {
-	glUseProgram(0);
-	glDeleteProgram(m_Program);
+	GLCall(glDeleteProgram(m_Program));
+	GLCall(glUseProgram(0));
 }
 
 void Shader::setUniformMat4f(const GLchar * uniform, glm::mat4 mat)
 {
 	bind();
 
-	GLint location = glGetUniformLocation(m_Program, uniform);
+	GLint location;
+	GLCall(location = glGetUniformLocation(m_Program, uniform));
 	GLCall(glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]));
+
+	//unbind();
 }
 
 void Shader::bind()
 {
 	GLCall(glUseProgram(m_Program));
+}
+
+void Shader::unbind()
+{
+	GLCall(glUseProgram(0));
+}
+
+const GLuint Shader::getProgram() const
+{
+	return m_Program;
 }

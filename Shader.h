@@ -26,6 +26,8 @@ public:
 	void setUniformMat4f(const GLchar* uniform, glm::mat4 mat);
 
 	void bind();
+	void unbind();
+	const GLuint getProgram() const;
 private:
 	const GLchar* readShader(const char* fileName);
 	GLuint loadShaders(ShaderInfo* shaders);

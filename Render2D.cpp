@@ -30,7 +30,8 @@ void SimpleRender::flush()
 		
 		cube->prepare();
 			GLCall(glDrawElements(GL_TRIANGLES, cube->getIndices(), GL_UNSIGNED_SHORT, NULL));
-		// Unbind()
+		cube->unbind();
+
 		m_RenderQueueCubes.pop_front();
 		
 	}

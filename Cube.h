@@ -12,20 +12,28 @@
 
 class Cube
 {
-private:
+protected:
 	Shader* m_pShaderProgram;
 	VertexArray m_VertexArray;
 	IndexBuffer* m_IndexBuffer;
 
 	glm::mat4 m_Translation;
+	glm::mat4 m_Scale;
+	
+	void _initShaders(ShaderInfo* shaders = nullptr);
 public:
 	Cube(float xPos, float yPos, float zPos);
-	~Cube();
+	Cube(float xPos, float yPos, float zPos, ShaderInfo* shaders);
+	Cube();
+	virtual ~Cube();
 
+	void setPosition(float xPos, float yPos, float zPos);
+	void setSize(float xSize, float ySize, float zSize);
 	void setCamMatrix(const Camera& camera);
 
 	GLuint getIndices() const;
-	void prepare();
+	virtual void prepare();
+	virtual void unbind();
 
 private:
 	void _buildCube();

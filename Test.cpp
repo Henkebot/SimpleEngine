@@ -1,6 +1,7 @@
 #include "window.h"
 
 #include "Cube.h"
+#include "TextureCube.h"
 #include "Render2D.h"
 #include "Camera.h"
 
@@ -17,9 +18,15 @@ main
 	
 	//----Crate cubes
 	Cube* cubes[25];
-	for(int i = 0; i < 5; i++)
-		for(int j = 0; j < 5; j++)
-			cubes[i+(j*5)] = new Cube(i, 0, j);
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			cubes[i+(j*5)] = new TextureCube(i*2, 0, j*2,"res/test2.bmp");
+		}
+	}
+
+	
 	
 	//----Camera
 	Camera camera(window.getWidth(), window.getHeight());
@@ -35,6 +42,7 @@ main
 		window.getMousePosition(x, y);
 
 		camera.update(x,y);
+
 		for (auto& cube : cubes)
 		{
 			cube->setCamMatrix(camera);

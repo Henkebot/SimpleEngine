@@ -20,6 +20,11 @@ void IndexBuffer::bind()
 	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ElementBuffer));
 }
 
+void IndexBuffer::unbind()
+{
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+}
+
 GLuint IndexBuffer::getIndices() const
 {
 	return m_Indices;
