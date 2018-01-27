@@ -17,7 +17,7 @@ void main()
 {
 	float specularStrength = 0.5;
 
-	float ambientStrength = 0.1f;
+	float ambientStrength = 0.5f;
 	vec3 ambient = vec3(1.0, 1.0,1.0) * ambientStrength;
 
 	vec3 lightUnitVector = normalize(fs_in.lightPos.xyz - fs_in.position.xyz);

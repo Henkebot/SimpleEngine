@@ -7,9 +7,8 @@ Camera::Camera(int winWidth, int winHeight, const glm::vec3 & position, const gl
 
 	m_Up = glm::vec3(0, 1, 0);
 
-	m_Yaw = 0;
-	m_Pitch = 0;
-	Init();
+	m_Yaw = 0.45f;
+	m_Pitch = 0.45f;
 
 }
 
@@ -27,7 +26,12 @@ const glm::vec3 Camera::getUp() const
 {
 	return m_Up;
 }
-#include <iostream>
+
+const glm::mat4 Camera::getViewMatrix() const
+{
+	return glm::lookAt(m_Position, m_Position + m_Target, m_Up);
+}
+
 void Camera::update(double xMouse, double yMouse)
 {
 	static float stepSize = 0.2f;
@@ -81,37 +85,5 @@ void Camera::update(double xMouse, double yMouse)
 	front.y = sin(glm::radians(m_Pitch));
 	front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 	m_Target = glm::normalize(front);
-
-}
-
-void Camera::Init()
-{
-	/*auto toDegree = [](float rad) { return rad * (180.0 / 3.141592653589793238463); };
-
-	glm::vec3 hTarget(m_Target.x, 0.0f, m_Target.z);
-	if (hTarget.z >= 0.0f)
-	{
-		if (hTarget.x > 0.0f)
-		{
-			m_AngleH = 360.0f - toDegree(asin(hTarget.z));
-		}
-		else
-		{
-			m_AngleH = 180.0f + toDegree(asin(hTarget.z));
-		}
-	}
-	else
-	{
-		if (hTarget.x >= 0.0f)
-		{
-			m_AngleH = toDegree(asin(-hTarget.z));
-		}
-		else
-		{
-			m_AngleH = 180.0f - toDegree(asin(-hTarget.z));
-		}
-	}
-
-	m_AngleV = -toDegree(asin(-hTarget.y));*/
 
 }

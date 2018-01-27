@@ -2,13 +2,10 @@
 #define SHADER_H
 
 #include <GL\glew.h>
+#include <glm.hpp>
+#include <stdio.h>
+#include "OpenGLError.h"
 
-#if _DEBUG
-#include <iostream>
-#define DPRINT(text) std::cout << (text)
-#elif
-#define DPRINT(text)
-#endif
 
 struct ShaderInfo
 {
@@ -17,9 +14,24 @@ struct ShaderInfo
 	GLuint shader;
 };
 
-const GLchar* readShader(const char* fileName);
+class Shader
+{
+private:
+	GLuint m_Program;
 
-GLuint loadShaders(ShaderInfo* shaders);
+public:
+	Shader(ShaderInfo* shaders);
+	~Shader();
+	
+	void setUniformMat4f(const GLchar* uniform, glm::mat4 mat);
+
+	void bind();
+private:
+	const GLchar* readShader(const char* fileName);
+	GLuint loadShaders(ShaderInfo* shaders);
+};
+
+
 
 #endif
 

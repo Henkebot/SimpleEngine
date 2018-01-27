@@ -1,13 +1,18 @@
 #include "Render2D.h"
 
-void Render2D::submit(RenderObject * er2D)
+//void SimpleRender::submit(RenderObject * er2D)
+//{
+//	m_RenderQueue.push_back(er2D);
+//}
+
+void SimpleRender::submit(Cube * cube)
 {
-	m_RenderQueue.push_back(er2D);
+	m_RenderQueueCubes.push_back(cube);
 }
 
-void Render2D::flush()
+void SimpleRender::flush()
 {
-	while (!m_RenderQueue.empty())
+	/*while (!m_RenderQueue.empty())
 	{
 		RenderObject* er2D = m_RenderQueue.front();
 		
@@ -18,5 +23,15 @@ void Render2D::flush()
 		er2D->unbind();
 
 		m_RenderQueue.pop_front();
+	}*/
+	while (!m_RenderQueueCubes.empty())
+	{
+		Cube* cube = m_RenderQueueCubes.front();
+		
+		cube->prepare();
+			GLCall(glDrawElements(GL_TRIANGLES, cube->getIndices(), GL_UNSIGNED_SHORT, NULL));
+		// Unbind()
+		m_RenderQueueCubes.pop_front();
+		
 	}
 }

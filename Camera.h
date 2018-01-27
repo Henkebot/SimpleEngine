@@ -21,15 +21,16 @@ private:
 	float m_Pitch;
 	glm::vec2 m_MousePos;
 public:
-	Camera(int winWidth, int winHeight, const glm::vec3& position, const glm::vec3& target);
+	Camera(int winWidth, int winHeight, const glm::vec3& position = glm::vec3(0,0,0), const glm::vec3& target = glm::vec3(0, 0, 1));
 	
 	const glm::vec3 getPos() const;
 	const glm::vec3 getTarget() const;
 	const glm::vec3 getUp() const;
 
+	const glm::mat4 getViewMatrix() const;
+
 	void update(double xMouse, double yMouse);
-private:
-	void Init();
+
 };
 
 #endif // !CAMERA_H

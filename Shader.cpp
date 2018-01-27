@@ -1,13 +1,14 @@
 #include "Shader.h"
+#include <iostream>
 
-const GLchar * readShader(const char * fileName)
+const GLchar * Shader::readShader(const char * fileName)
 {
 	FILE* file;
 	fopen_s(&file, fileName, "rb");
 
 	if (!file)
 	{
-		DPRINT("Couldn't open shader file");
+		std::cout << "Shader: Couldn't open " << fileName << ".\n";
 		return nullptr;
 	}
 
@@ -23,7 +24,7 @@ const GLchar * readShader(const char * fileName)
 	return const_cast<const GLchar*>(source);
 }
 
-GLuint loadShaders(ShaderInfo * shaders)
+GLuint Shader::loadShaders(ShaderInfo * shaders)
 {
 	if (shaders == nullptr) return 0;
 
@@ -41,6 +42,7 @@ GLuint loadShaders(ShaderInfo * shaders)
 		{
 			glDeleteShader(entry->shader);
 			entry->shader = 0;
+			// Error notified in readShader()
 			// Clear all the shaders since an error occured
 			for (entry = shaders; entry->type != GL_NONE; entry++)
 			{
@@ -51,23 +53,22 @@ GLuint loadShaders(ShaderInfo * shaders)
 			return 0;
 		}
 		// Wanna do nullptr instead of NULL
-		glShaderSource(shader, 1, &shaderSource, NULL);
+		GLCall(glShaderSource(shader, 1, &shaderSource, NULL));
 		delete[] shaderSource;
 
-		glCompileShader(shader);
+		GLCall(glCompileShader(shader));
 		GLint compiledFlag;
-		glGetShaderiv(shader, GL_COMPILE_STATUS, &compiledFlag);
+		GLCall(glGetShaderiv(shader, GL_COMPILE_STATUS, &compiledFlag));
 
 		if (!compiledFlag)
 		{
-#if _DEBUG
 			GLsizei length;
 			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 			GLchar* log = new GLchar[length + 1];
 			glGetShaderInfoLog(shader, length, &length, log);
-			DPRINT(log);
+			std::cout << entry->fileName << " failed, log:\n" << log << std::endl;
 			delete[] log;
-#endif
+
 
 			return 0;
 		}
@@ -76,19 +77,19 @@ GLuint loadShaders(ShaderInfo * shaders)
 		entry++;
 	}
 
-	glLinkProgram(program);
+	GLCall(glLinkProgram(program));
 
 	GLint linkFlag;
 	glGetProgramiv(program, GL_LINK_STATUS, &linkFlag);
 	if (!linkFlag)
 	{
-#if _DEBUG
 		GLsizei length;
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
 		GLchar* log = new GLchar[length + 1];
 		glGetProgramInfoLog(program, length, &length, log);
-		DPRINT(log);
-#endif
+		
+		std::cout << "Failed to link program, log:\n" << log << std::endl;
+
 		for (entry = shaders; entry->type != GL_NONE; entry++)
 		{
 			glDeleteShader(entry->shader);
@@ -96,6 +97,37 @@ GLuint loadShaders(ShaderInfo * shaders)
 		}
 		return 0;
 	}
+	// Detach and remove shaders because they are no longer needed.
+	for (entry = shaders; entry->type != GL_NONE; entry++)
+	{
+		glDetachShader(m_Program, entry->shader);
+		glDeleteShader(entry->shader);
+		entry->shader = 0;
+	}
 
 	return program;
+}
+
+Shader::Shader(ShaderInfo * shaders)
+{
+	m_Program = loadShaders(shaders);
+}
+
+Shader::~Shader()
+{
+	glUseProgram(0);
+	glDeleteProgram(m_Program);
+}
+
+void Shader::setUniformMat4f(const GLchar * uniform, glm::mat4 mat)
+{
+	bind();
+
+	GLint location = glGetUniformLocation(m_Program, uniform);
+	GLCall(glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]));
+}
+
+void Shader::bind()
+{
+	GLCall(glUseProgram(m_Program));
 }

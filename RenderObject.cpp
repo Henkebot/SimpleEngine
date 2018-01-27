@@ -146,3 +146,30 @@ bool RenderObject::init(ShaderInfo * shaders, const VertexData & vert)
 
 	return true;
 }
+
+
+for (int i = 0; i < 512 - 1; i++)
+{
+	for (int j = 0; j < 512 - 1; j++)
+	{
+		VERTEX v;
+
+		v = VERTEX{ (float)j,((float)heightMap[i][j] - 128) / 255,(float)i };
+		vertexVector.push_back(v);
+
+		v = VERTEX{ (float)(j + 1), ((float)heightMap[i][j] - 128) / 255,(float)i };
+		vertexVector.push_back(v);
+
+		v = VERTEX{ (float)j, ((float)heightMap[i][j] - 128) / 255,(float)(i + 1) };
+		vertexVector.push_back(v);
+
+		v = VERTEX{ (float)(j + 1), ((float)heightMap[i][j] - 128) / 255,(float)i };
+		vertexVector.push_back(v);
+
+		v = VERTEX{ (float)(j + 1), ((float)heightMap[i][j] - 128) / 255,(float)(i + 1) };
+		vertexVector.push_back(v);
+
+		v = VERTEX{ (float)(j), ((float)heightMap[i][j] - 128) / 255,(float)(i + 1) };
+		vertexVector.push_back(v);
+	}
+}

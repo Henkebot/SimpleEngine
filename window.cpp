@@ -1,7 +1,7 @@
 #include "window.h"
 
 Window::Window(const char * title, int width, int height) 
-	: m_Width(width), m_Height(height), m_Title(title)
+	: m_Width(width), m_Height(height), m_Title(title), m_Running(true)
 {
 	if (!init())
 		glfwTerminate();
@@ -11,7 +11,7 @@ Window::Window(const char * title, int width, int height)
 
 bool Window::closed() const
 {
-	return !glfwWindowShouldClose(m_pWindow);
+	return !glfwWindowShouldClose(m_pWindow) && glfwGetKey(m_pWindow,GLFW_KEY_ESCAPE) != GLFW_PRESS;
 }
 
 void Window::clear() const
@@ -26,15 +26,30 @@ void Window::update() const
 	glfwSwapBuffers(m_pWindow);
 }
 
+void Window::hideAndGrabMouseMode()
+{
+	glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void Window::restoreMouse()
+{
+	glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
 void Window::getMousePosition(double & x, double & y)
 {
 	x = mouseX;
 	y = mouseY;
 }
 
+void Window::closeWindow()
+{
+	glfwSetWindowShouldClose(m_pWindow, GLFW_FALSE);
+}
+
 Window::~Window()
 {
-	//glfwDestroyWindow(m_pWindow);
+	glfwDestroyWindow(m_pWindow);
 	glfwTerminate();
 }
 
@@ -67,6 +82,11 @@ bool Window::init()
 		return false;
 	}
 
+	glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // We want OpenGL 3.3
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+
+
 	m_pWindow = glfwCreateWindow(m_Width, m_Height, m_Title, NULL, NULL);
 
 	if (!m_pWindow)
@@ -74,13 +94,13 @@ bool Window::init()
 		DPRINT("Failed to Create GLFW Window.");
 		return false;
 	}
-
 	glfwMakeContextCurrent(m_pWindow);
 	glfwSetWindowUserPointer(m_pWindow, this);
 	glfwSetWindowSizeCallback(m_pWindow, resize_callback);
 	glfwSetCursorPosCallback(m_pWindow, cursor_position_callback);
-
-	glfwSetInputMode(m_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	
+	// Set to 0 for unlimited FPS!
+	glfwSwapInterval(1);
 
 	// GLFW INIT COMPLETE FROM THIS POINT
 	if (glewInit() != GLEW_OK)
