@@ -23,20 +23,17 @@ main
 	textureCubes[0]->setSize(200, 200, 200);
 	
 	//----Crate cubes
-	Cube* cubes[25];
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			cubes[i + (j * 5)] = new Cube(i * 2, 2, j * 2);
-		}
-	}
+	Cube* cubes[1];
+	cubes[0] = new TextureCube(0,-0.5f,0, "res/test2.bmp");
+	cubes[0]->setSize(10, 1, 10);
+
 	
-	Model testCubeObj("res/Objs/cabane.obj");
+	Model testCubeObj("res/Objs/akali.obj","res/Objs/akali.bmp");
 	static const GLfloat aspect = 1280.0f / 720.0f;
 	static const glm::mat4 projection = glm::perspective(70.0f, aspect, 0.01f, 200.0f);
 
 	testCubeObj.getShader()->setUniformMat4f("Projection", projection);
+	testCubeObj.getShader()->setUniformMat4f("World", glm::scale(glm::vec3(0.1f, 0.1f, 0.1f)));
 
 
 

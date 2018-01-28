@@ -14,8 +14,10 @@ struct Model::PackedVertex
 	}
 };
 
-Model::Model(const char * obj)
+Model::Model(const char * obj, const char* texture)
 {
+	
+
 	std::vector<glm::vec3> vertices, iVertices, normals, iNormals;
 	std::vector<glm::vec2> uvs, iUvs;
 
@@ -23,6 +25,11 @@ Model::Model(const char * obj)
 	
 	std::vector<unsigned short> indices;
 	_indexVBO(vertices, uvs, normals, indices, iVertices, iUvs, iNormals);
+
+	if (m_UsingTextures)
+	{
+		m_Texture = new Texture(texture);
+	}
 
 	ShaderInfo shaders[] =
 	{
@@ -43,6 +50,7 @@ Model::Model(const char * obj)
 Model::~Model()
 {
 	delete m_Shader;
+	delete m_Texture;
 	delete m_Index;
 }
 
@@ -53,11 +61,14 @@ Shader * Model::getShader()
 
 void Model::draw()
 {
+	m_Texture->bind(GL_TEXTURE0);
 	m_Shader->bind();
 	m_Vao.bind();
 	m_Index->bind();
 
 	GLCall(glDrawElements(GL_TRIANGLES, m_Index->getIndices(), GL_UNSIGNED_SHORT, NULL));
+
+	m_Texture->unbind();
 }
 
 bool Model::_loadObj(const char * path, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals)
@@ -107,7 +118,6 @@ bool Model::_loadObj(const char * path, std::vector<glm::vec3>& out_vertices, st
 		{
 			
 			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			
 			if (m_UsingTextures && m_UsingNormals)
 			{
 				int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d", &vertexIndex[0], &uvIndex[0], &normalIndex[0],
@@ -126,7 +136,13 @@ bool Model::_loadObj(const char * path, std::vector<glm::vec3>& out_vertices, st
 				int matches = fscanf_s(file, "%d//%d %d//%d %d//%d", &vertexIndex[0], &normalIndex[0],
 					&vertexIndex[1], &normalIndex[1],
 					&vertexIndex[2], &normalIndex[2]);
-				if (matches != 6)
+				
+				if (matches == 1)
+				{
+					std::cout << "Model: Obj-format is stupid, no normals from here on!\n";
+					
+
+				}else if (matches != 6)
 				{
 					std::cout << "Model: Obj-format not supported\n";
 					fclose(file);

@@ -4,6 +4,7 @@
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "Texture.h"
 #include <map>
 #include <vector>
 #include <glm.hpp>
@@ -16,11 +17,12 @@ private:
 	struct PackedVertex;
 	bool m_UsingNormals;
 	bool m_UsingTextures;
+	Texture* m_Texture;
 	Shader* m_Shader;
 	VertexArray m_Vao;
 	IndexBuffer* m_Index;
 public:
-	Model(const char* obj);
+	Model(const char* obj, const char* texture = NULL);
 	~Model();
 
 	Shader* getShader();

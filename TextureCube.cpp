@@ -113,9 +113,9 @@ void TextureCube::_initTextureCube()
 		0.0f, 0.66f,
 
 		//Top
-		0.5f, 0.66666f,
-		0.249f, 0.666666f,
-		0.249f, 1.0f,
+		0.5f, 0.66f,
+		0.25f, 0.66f,
+		0.25f, 1.0f,
 		0.5f, 1.0f,
 
 		//Bottom

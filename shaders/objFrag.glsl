@@ -1,10 +1,25 @@
 #version 440
 layout(location = 0) out vec4 outColor;
 
-in vec2 out_uvs;
-in vec3 out_normals;
+uniform sampler2D texture1;
+
+in DATA
+{
+	vec3 pos;
+	vec2 uvs;
+	vec3 normals;
+} fs_in;
 
 void main()
 {
-	outColor = vec4(out_normals,1.0f);
+	vec3 lightPos = vec3(0,5,5);
+
+	vec3 lightUnitVector = normalize(lightPos - fs_in.pos);
+	vec3 normal = normalize(fs_in.normals);
+
+	float diffuse = max(dot(lightUnitVector,normal),0.0);
+
+	vec4 color = texture(texture1, fs_in.uvs);
+
+	outColor = color * diffuse;
 }
