@@ -17,12 +17,16 @@ main
 	GLCall(glEnable(GL_DEPTH_TEST));
 	
 	//----Crate cubes
+	Cube* textureCubes[1];
+	textureCubes[0] = new TextureCube(0, 0, 0,"res/sky.bmp");
+	textureCubes[0]->setSize(200, 200, 200);
+	
 	Cube* cubes[25];
 	for (int i = 0; i < 5; i++)
 	{
 		for (int j = 0; j < 5; j++)
 		{
-			cubes[i+(j*5)] = new TextureCube(i*2, 0, j*2,"res/test2.bmp");
+			cubes[i + (j * 5)] = new Cube(i * 2, 2, j * 2);
 		}
 	}
 
@@ -49,11 +53,20 @@ main
 			render.submit(cube);
 		}
 
+		for (auto& cube : textureCubes)
+		{
+			cube->setCamMatrix(camera);
+			render.submit(cube);
+		}
+
 		render.flush();
 		window.update();
 	}
 
 	for (auto& cube : cubes)
+		delete cube;
+
+	for (auto& cube : textureCubes)
 		delete cube;
 
 	return 0;
