@@ -10,6 +10,16 @@ IndexBuffer::IndexBuffer(const GLushort * indices, GLuint count)
 	}
 }
 
+IndexBuffer::IndexBuffer(const std::vector<GLushort> indices)
+	:m_Indices(indices.size() - 1)
+{
+	GLCall(glGenBuffers(1, &m_ElementBuffer));
+	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ElementBuffer));
+	{
+		GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW));
+	}
+}
+
 IndexBuffer::~IndexBuffer()
 {
 	GLCall(glDeleteBuffers(1, &m_ElementBuffer));

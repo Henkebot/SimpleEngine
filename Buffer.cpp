@@ -9,6 +9,22 @@ Buffer::Buffer(const GLfloat * data, GLint count, GLuint components)
 
 }
 
+Buffer::Buffer(const std::vector<glm::vec3> data)
+	:m_Components(3)
+{
+	GLCall(glGenBuffers(1, &m_Buffer));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_Buffer));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec3), &data[0], GL_STATIC_DRAW));
+}
+
+Buffer::Buffer(const std::vector<glm::vec2> data)
+	: m_Components(2)
+{
+	GLCall(glGenBuffers(1, &m_Buffer));
+	GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_Buffer));
+	GLCall(glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec2), &data[0], GL_STATIC_DRAW));
+}
+
 Buffer::~Buffer()
 {
 	GLCall(glDeleteBuffers(1, &m_Buffer));
