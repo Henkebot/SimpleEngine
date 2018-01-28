@@ -23,6 +23,8 @@ void Texture::unbind()
 
 GLuint Texture::_initBMP(const GLchar * textureSrc)
 {
+	std::cout << "\nTexture: Reading BMP(" << textureSrc << ")...";
+
 	unsigned char header[54];	// Each BMP file begins by a 54-bytes header
 	unsigned int dataPos;		// Position in the file where the actual data begins
 	unsigned int width, height;	
@@ -61,7 +63,7 @@ GLuint Texture::_initBMP(const GLchar * textureSrc)
 	data = new unsigned char[imageSize];
 	fread(data, 1, imageSize, file);
 	fclose(file);
-
+	std::cout << "Done!\n";
 	GLuint texture;
 	GLCall(glGenTextures(1, &texture));
 	GLCall(glBindTexture(GL_TEXTURE_2D, texture));
