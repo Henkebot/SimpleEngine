@@ -4,6 +4,7 @@
 #include "TextureCube.h"
 #include "Render2D.h"
 #include "Camera.h"
+#include "Model.h"
 
 main
 {
@@ -16,11 +17,12 @@ main
 	//----OpenGL Settings
 	GLCall(glEnable(GL_DEPTH_TEST));
 	
-	//----Crate cubes
+	//----Sky box
 	Cube* textureCubes[1];
 	textureCubes[0] = new TextureCube(0, 0, 0,"res/sky.bmp");
 	textureCubes[0]->setSize(200, 200, 200);
 	
+	//----Crate cubes
 	Cube* cubes[25];
 	for (int i = 0; i < 5; i++)
 	{
@@ -29,9 +31,15 @@ main
 			cubes[i + (j * 5)] = new Cube(i * 2, 2, j * 2);
 		}
 	}
+	
+	Model testCubeObj("res/Objs/cabane.obj");
+	static const GLfloat aspect = 1280.0f / 720.0f;
+	static const glm::mat4 projection = glm::perspective(70.0f, aspect, 0.01f, 200.0f);
 
-	
-	
+	testCubeObj.getShader()->setUniformMat4f("Projection", projection);
+
+
+
 	//----Camera
 	Camera camera(window.getWidth(), window.getHeight());
 
@@ -58,6 +66,8 @@ main
 			cube->setCamMatrix(camera);
 			render.submit(cube);
 		}
+		testCubeObj.getShader()->setUniformMat4f("View", camera.getViewMatrix());
+		testCubeObj.draw();
 
 		render.flush();
 		window.update();
