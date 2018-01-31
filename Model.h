@@ -5,6 +5,7 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "Material.h"
 #include <map>
 #include <vector>
 #include <glm.hpp>
@@ -15,24 +16,40 @@ class Model
 	
 private:
 	struct PackedVertex;
+
 	bool m_UsingNormals;
 	bool m_UsingTextures;
+
 	Texture* m_Texture;
 	Shader* m_Shader;
 	VertexArray m_Vao;
 	IndexBuffer* m_Index;
+
+	std::vector<IndexBuffer*> m_Indexes;
+	std::vector<VertexArray*> m_Vaos;
+	std::vector<Material*> m_Materials;
 public:
 	Model(const char* obj, const char* texture = NULL);
+	Model(const char* path, const char* objname, int lol);
 	~Model();
 
 	Shader* getShader();
 	void draw();
 
 private:
+
+	std::vector<Material*> _getMaterialsFromFile(const char* path, const char* objname);
+
 	bool _loadObj(const char* path, 
 		std::vector<glm::vec3>& out_vertices, 
 		std::vector<glm::vec2>& out_uvs, 
 		std::vector<glm::vec3>& out_normals);
+
+	bool _loadObjContinoues(FILE* file,
+		std::vector<glm::vec3>& out_vertices,
+		std::vector<glm::vec2>& out_uvs,
+		std::vector<glm::vec3>& out_normals,
+		const char*& mtlName);
 
 	bool _getSimilarVertexIndex_fast(
 		PackedVertex & packed, std::map<PackedVertex, unsigned short>& vertexToOutIndex, unsigned short & result

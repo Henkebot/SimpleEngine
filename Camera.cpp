@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera(int winWidth, int winHeight, const glm::vec3 & position, const glm::vec3 & target)
+Camera::Camera(int winWidth, int winHeight, const glm::vec3& target, const glm::vec3& position)
 	: m_Width(winWidth), m_Height(winHeight), m_Position(position)
 {
 	m_Target = glm::normalize(target);

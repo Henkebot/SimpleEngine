@@ -143,7 +143,7 @@ void TextureCube::_initTextureCube()
 		20, 21, 22, 20, 22, 23   //bottom
 	};
 
-	m_IndexBuffer = new IndexBuffer(indices, (sizeof(indices) / sizeof(GLushort)));
+	m_IndexBuffer = new IndexBuffer(indices, sizeof(indices));
 
 
 	
