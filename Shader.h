@@ -22,7 +22,7 @@ private:
 public:
 	Shader(ShaderInfo* shaders);
 	~Shader();
-	
+
 	void setUniformMat4f(const GLchar* uniform, glm::mat4 mat);
 
 	void bind();

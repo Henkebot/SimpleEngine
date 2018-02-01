@@ -32,8 +32,10 @@ private:
 
 public:
 	Material(const char* name);
+	~Material();
 	
 	void bind();
+	void unbind();
 	
 	inline void setAmbientColor(float r, float g, float b) { m_AmbientColor = glm::vec3(r, g, b); }
 	inline void setDiffuseColor(float r, float g, float b) { m_DiffuseColor = glm::vec3(r, g, b); }

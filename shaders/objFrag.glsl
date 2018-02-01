@@ -12,7 +12,7 @@ in DATA
 
 void main()
 {
-	vec3 lightPos = vec3(0,5,5);
+	vec3 lightPos = vec3(0,20,10);
 
 	vec3 lightUnitVector = normalize(lightPos - fs_in.pos);
 	vec3 normal = normalize(fs_in.normals);

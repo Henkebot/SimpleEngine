@@ -6,9 +6,21 @@ Material::Material(const char* name)
 
 }
 
+Material::~Material()
+{
+//	delete m_DiffuseMapTexture;
+	//delete m_DiffuseMap;
+//	delete m_Name;
+}
+
 void Material::bind()
 {
 	m_DiffuseMapTexture->bind(GL_TEXTURE0);
+}
+
+void Material::unbind()
+{
+	m_DiffuseMapTexture->unbind();
 }
 
 void Material::setDiffuseMap(const char * diffuseMap)

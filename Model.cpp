@@ -17,7 +17,6 @@ struct Model::PackedVertex
 
 Model::Model(const char * obj, const char* texture)
 {
-	
 
 	std::vector<glm::vec3> vertices, iVertices, normals, iNormals;
 	std::vector<glm::vec2> uvs, iUvs;
@@ -87,7 +86,6 @@ Model::Model(const char * path, const char * objname, int lol)
 		{
 			if (strcmp(name, materials.at(i)->getName()) == 0)
 			{
-				std::cout << name << std::endl; 
 				m_Materials.push_back(materials.at(i));
 				break;
 			}
@@ -153,6 +151,8 @@ void Model::draw()
 			m_Materials[i]->bind();
 
 			GLCall(glDrawElements(GL_TRIANGLES, m_Indexes[i]->getIndices(), GL_UNSIGNED_SHORT, NULL));
+
+			m_Materials[i]->unbind();
 
 		}
 }

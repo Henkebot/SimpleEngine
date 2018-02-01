@@ -89,7 +89,7 @@ GLuint Shader::loadShaders(ShaderInfo * shaders)
 		GLchar* log = new GLchar[length + 1];
 		glGetProgramInfoLog(program, length, &length, log);
 		
-		std::cout << "Failed to link program, log:\n" << log << std::endl;
+		std::cout << "Failed to link program(" << shaders->fileName << ", log:\n" << log << std::endl;
 
 		for (entry = shaders; entry->type != GL_NONE; entry++)
 		{
