@@ -23,15 +23,15 @@ main
 	cubes[0] = new TextureCube(0,-0.5f,0, "res/test2.bmp");
 	cubes[0]->setSize(10, 1, 10);
 
-	//Model mario("res/Objs/Mario", "FitMario00.obj", 1);
+	Model mario("res/Objs/nanosuit", "nanosuit.obj", 1);
 	Model nano("res/Objs/Pokemon", "Pokemon_Center.obj", 1);
 	static const GLfloat aspect = 1280.0f / 720.0f;
 	static const glm::mat4 projection = glm::perspective(70.0f, aspect, 0.01f, 200.0f);
 
 	nano.getShader()->setUniformMat4f("Projection", projection);
 	nano.getShader()->setUniformMat4f("World", glm::scale(glm::translate(glm::vec3(0,5,0)),glm::vec3(0.1f, 0.1f, 0.1f)));
-	/*mario.getShader()->setUniformMat4f("Projection", projection);
-	mario.getShader()->setUniformMat4f("World", glm::scale(glm::vec3(0.1f, 0.1f, 0.1f)));*/
+	mario.getShader()->setUniformMat4f("Projection", projection);
+	mario.getShader()->setUniformMat4f("World", glm::scale(glm::vec3(0.1f, 0.1f, 0.1f)));
 
 	Skybox box("res/skyboxes/Skybox2/skybox", GL_TEXTURE0);
 
@@ -58,8 +58,8 @@ main
 			render.submit(cube);
 		}
 
-		/*mario.getShader()->setUniformMat4f("View", camera.getViewMatrix());
-		mario.draw();*/
+		mario.getShader()->setUniformMat4f("View", camera.getViewMatrix());
+		mario.draw();
 		nano.getShader()->setUniformMat4f("View", camera.getViewMatrix());
 		nano.draw();
 

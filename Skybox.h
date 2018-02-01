@@ -15,6 +15,7 @@ private:
 	GLuint m_Texture;
 public:
 	Skybox(const char* skybox, GLenum texture);
+	~Skybox();
 
 	void render(const Camera& camera);
 

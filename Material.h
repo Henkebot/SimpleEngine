@@ -27,7 +27,6 @@ private:
 	// Ni (How the light refracts thro the surface, water have 1.5)
 	float m_SurfaceDensity;
 	//map_Kd(Texture)
-	const char* m_DiffuseMap;
 	Texture* m_DiffuseMapTexture;
 
 public:
@@ -48,6 +47,8 @@ public:
 	void setDiffuseMap(const char* diffuseMap);
 
 	inline const char* getName() const { return m_Name; }
+
+	bool operator==(const Material& other) const;
 
 
 		

@@ -49,8 +49,7 @@ Model::Model(const char * obj, const char* texture)
 
 Model::Model(const char * path, const char * objname, int lol)
 {
-	m_UsingNormals = true;
-	m_UsingTextures = true;
+
 	std::vector<Material*> materials =  _getMaterialsFromFile(path, objname);
 	if (materials.size() == 0)
 	{
@@ -69,6 +68,12 @@ Model::Model(const char * path, const char * objname, int lol)
 	{
 		std::cout << "ERROR:Model: Failed to read obj file" << finalPath << std::endl;
 	}
+
+	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
+	std::vector<glm::vec3> temp_vertices;
+	std::vector<glm::vec2> temp_uvs;
+	std::vector<glm::vec3> temp_normals;
+
 	while (1)
 	{
 		char line[128];
@@ -80,7 +85,7 @@ Model::Model(const char * path, const char * objname, int lol)
 		std::vector<glm::vec3> vertices, iVertices, normals, iNormals;
 		std::vector<glm::vec2> uvs, iUvs;
 		const char* name = nullptr;
-		_loadObjContinoues(objFile, vertices, uvs, normals, name);
+		_loadObjContinoues(objFile, vertexIndices, uvIndices, normalIndices, temp_vertices, temp_uvs, temp_normals, vertices, uvs, normals, name);
 		std::vector<unsigned short> indices;
 		for (int i = 0; i < materials.size(); i++)
 		{
@@ -90,6 +95,7 @@ Model::Model(const char * path, const char * objname, int lol)
 				break;
 			}
 		}
+		delete[] name;
 		_indexVBO(vertices, uvs, normals, indices, iVertices, iUvs, iNormals);
 		// NOW WE CAN SEND THIS SHIT TO THE BUFFERS
 		/* The problem right now is that we need to render each vao seperately and each time
@@ -103,21 +109,13 @@ Model::Model(const char * path, const char * objname, int lol)
 
 		m_Vaos.push_back(localVao);
 		m_Indexes.push_back(iB);
-		//vertices.clear();
-		//iVertices.clear();
-		//normals.clear();
-		//iNormals.clear();
-		//uvs.clear();
-		//iUvs.clear();
-		//indices.clear();
-
 	}
 
 	ShaderInfo shaders[] =
 	{
 		{ GL_VERTEX_SHADER, "shaders/objVert.glsl" },
-	{ GL_FRAGMENT_SHADER, "shaders/objFrag.glsl" },
-	{ GL_NONE, NULL }
+		{ GL_FRAGMENT_SHADER, "shaders/objFrag.glsl" },
+		{ GL_NONE, NULL }
 	};
 
 	m_Shader = new Shader(shaders);
@@ -134,6 +132,18 @@ Model::~Model()
 		delete index;
 	for (auto& vertx : m_Vaos)
 		delete vertx;
+
+	for (int i = 0; i < m_Materials.size(); i++)
+	{
+		bool found = false;
+		for (int k = i + 1; k < m_Materials.size() - 1; k++)
+		{
+			found = *m_Materials.at(i) == *m_Materials.at(k);
+			if (found) break;
+		}
+		if (!found)
+			delete m_Materials.at(i);
+	}
 }
 
 Shader * Model::getShader()
@@ -440,12 +450,18 @@ bool Model::_loadObj(const char * path, std::vector<glm::vec3>& out_vertices, st
 	return true;
 }
 
-bool Model::_loadObjContinoues(FILE * file, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals, const char*& mtlName)
+bool Model::_loadObjContinoues(FILE* file,
+	std::vector<unsigned int>& vertexIndices,
+	std::vector<unsigned int>& uvIndices,
+	std::vector<unsigned int>& normalIndices,
+	std::vector<glm::vec3>& temp_vertices,
+	std::vector<glm::vec2>& temp_uvs,
+	std::vector<glm::vec3>& temp_normals,
+	std::vector<glm::vec3>& out_vertices,
+	std::vector<glm::vec2>& out_uvs,
+	std::vector<glm::vec3>& out_normals,
+	const char*& mtlName)
 {
-	static std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
-	static std::vector<glm::vec3> temp_vertices;
-	static std::vector<glm::vec2> temp_uvs;
-	static std::vector<glm::vec3> temp_normals;
 
 	bool loadFace = false;
 	bool loadVert = false;
@@ -554,15 +570,8 @@ void Model::_indexVBO(std::vector<glm::vec3>& in_vertics, std::vector<glm::vec2>
 	
 	for (unsigned int i = 0; i < in_vertics.size(); i++)
 	{
-		Model::PackedVertex packed;
-
-		if(m_UsingNormals && m_UsingTextures)
-			packed = { in_vertics[i],in_uvs[i],in_normals[i] };
-		else	
-			packed = { in_vertics[i] };
+		Model::PackedVertex packed = { in_vertics[i],in_uvs[i],in_normals[i] };
 		
-
-
 		unsigned short index;
 		bool found = _getSimilarVertexIndex_fast(packed, VertexToOutIndex, index);
 
@@ -573,8 +582,8 @@ void Model::_indexVBO(std::vector<glm::vec3>& in_vertics, std::vector<glm::vec2>
 		else
 		{
 			out_vertices.push_back(in_vertics[i]);
-			if(m_UsingTextures) out_uvs.push_back(in_uvs[i]);
-			if(m_UsingNormals) out_normals.push_back(in_normals[i]);
+			out_uvs.push_back(in_uvs[i]);
+			out_normals.push_back(in_normals[i]);
 			
 			unsigned short newIndex = (unsigned short)out_vertices.size() - 1;
 			out_indices.push_back(newIndex);
