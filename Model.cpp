@@ -18,7 +18,7 @@ struct Model::PackedVertex
 Model::Model(const char * obj, const char* texture)
 {
 
-	std::vector<glm::vec3> vertices, iVertices, normals, iNormals;
+	/*std::vector<glm::vec3> vertices, iVertices, normals, iNormals;
 	std::vector<glm::vec2> uvs, iUvs;
 
 	_loadObj(obj, vertices, uvs, normals);
@@ -28,7 +28,7 @@ Model::Model(const char * obj, const char* texture)
 
 	if (m_UsingTextures)
 	{
-		m_Texture = new Texture(texture);
+		m_Texture = new Texture(texture, texture);
 	}
 
 	ShaderInfo shaders[] =
@@ -44,7 +44,7 @@ Model::Model(const char * obj, const char* texture)
 	if(m_UsingTextures) m_Vao.addBuffer(new Buffer(iUvs), 1);
 	if(m_UsingNormals) m_Vao.addBuffer(new Buffer(iNormals), 2);
 
-	m_Index = new IndexBuffer(indices);
+	m_Index = new IndexBuffer(indices);*/
 }
 
 Model::Model(const char * path, const char * objname, int lol)
@@ -85,8 +85,9 @@ Model::Model(const char * path, const char * objname, int lol)
 		std::vector<glm::vec3> vertices, iVertices, normals, iNormals;
 		std::vector<glm::vec2> uvs, iUvs;
 		const char* name = nullptr;
+		// Load Obj
 		_loadObjContinoues(objFile, vertexIndices, uvIndices, normalIndices, temp_vertices, temp_uvs, temp_normals, vertices, uvs, normals, name);
-		std::vector<unsigned short> indices;
+		// Find that material which is being used in the mesh
 		for (int i = 0; i < materials.size(); i++)
 		{
 			if (strcmp(name, materials.at(i)->getName()) == 0)
@@ -96,7 +97,18 @@ Model::Model(const char * path, const char * objname, int lol)
 			}
 		}
 		delete[] name;
-		_indexVBO(vertices, uvs, normals, indices, iVertices, iUvs, iNormals);
+
+		// Calculate tangents and bitangents.
+		std::vector<glm::vec3> tangents;
+		std::vector<glm::vec3> bitangents;
+		std::vector<glm::vec3> indexed_tangents;
+		std::vector<glm::vec3> indexed_bitangents;
+		
+		computeTangentBasis(vertices, uvs, normals, tangents, bitangents);
+		
+		std::vector<unsigned short> indices;
+
+		_indexVBO(vertices, uvs, normals, tangents, bitangents, indices, iVertices, iUvs, iNormals, indexed_tangents, indexed_bitangents);
 		// NOW WE CAN SEND THIS SHIT TO THE BUFFERS
 		/* The problem right now is that we need to render each vao seperately and each time
 		update the buffer with the constants for each vao. We need to also bind all the textures needed*/
@@ -104,6 +116,8 @@ Model::Model(const char * path, const char * objname, int lol)
 		localVao->addBuffer(new Buffer(iVertices), 0);
 		localVao->addBuffer(new Buffer(iUvs), 1);
 		localVao->addBuffer(new Buffer(iNormals), 2);
+		localVao->addBuffer(new Buffer(indexed_tangents), 3);
+		localVao->addBuffer(new Buffer(indexed_bitangents), 3);
 
 		IndexBuffer* iB = new IndexBuffer(indices);
 
@@ -119,6 +133,7 @@ Model::Model(const char * path, const char * objname, int lol)
 	};
 
 	m_Shader = new Shader(shaders);
+
 
 }
 
@@ -158,7 +173,7 @@ void Model::draw()
 		{
 			m_Vaos[i]->bind();
 			m_Indexes[i]->bind();
-			m_Materials[i]->bind();
+			m_Materials[i]->bind(m_Shader);
 
 			GLCall(glDrawElements(GL_TRIANGLES, m_Indexes[i]->getIndices(), GL_UNSIGNED_SHORT, NULL));
 
@@ -297,6 +312,37 @@ std::vector<Material*> Model::_getMaterialsFromFile(const char * path, const cha
 			location += mapKd;
 			materials.back()->setDiffuseMap(location.c_str());
 		}
+		else if (strcmp("map_Ka", line) == 0)
+		{
+			char mapKa[128];
+			fscanf_s(mttlibFile, "%s", mapKa, sizeof(mapKa));
+
+			std::string location = path;
+			location += "/";
+			location += mapKa;
+			materials.back()->setAmbientMap(location.c_str());
+		}
+		else if (strcmp("map_Ks", line) == 0)
+		{
+			char mapKs[128];
+			fscanf_s(mttlibFile, "%s", mapKs, sizeof(mapKs));
+
+			std::string location = path;
+			location += "/";
+			location += mapKs;
+			materials.back()->setSpecularMap(location.c_str());
+		}
+		else if (strcmp("map_Bump", line) == 0)
+		{
+			char mapBump[128];
+			fscanf_s(mttlibFile, "%s", mapBump, sizeof(mapBump));
+
+			std::string location = path;
+			location += "/";
+			location += mapBump;
+			materials.back()->setBumpMap(location.c_str());
+		}
+
 	
 
 	}
@@ -552,6 +598,41 @@ bool Model::_loadObjContinoues(FILE* file,
 	return true;
 }
 
+void Model::computeTangentBasis(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec2>& uvs, const std::vector<glm::vec3>& normals, std::vector<glm::vec3>& tangents, std::vector<glm::vec3>& bitangents)
+{
+	for (unsigned int i = 0; i < vertices.size(); i += 3)
+	{
+		glm::vec3 v0 = vertices[i + 0];
+		glm::vec3 v1 = vertices[i + 1];
+		glm::vec3 v2 = vertices[i + 2];
+
+		glm::vec2 uv0 = uvs[i + 0];
+		glm::vec2 uv1 = uvs[i + 1];
+		glm::vec2 uv2 = uvs[i + 2];
+
+		glm::vec3 deltaPos1 = v1 - v0;
+		glm::vec3 deltaPos2 = v2 - v0;
+
+		glm::vec2 deltaUV1 = uv1 - uv0;
+		glm::vec2 deltaUV2 = uv2 - uv0;
+
+		float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
+		glm::vec3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
+		glm::vec3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
+
+		tangents.push_back(tangent);
+		tangents.push_back(tangent);
+		tangents.push_back(tangent);
+
+		bitangents.push_back(bitangent);
+		bitangents.push_back(bitangent);
+		bitangents.push_back(bitangent);
+
+
+
+	}
+}
+
 bool Model::_getSimilarVertexIndex_fast(PackedVertex & packed, std::map<PackedVertex, unsigned short>& vertexToOutIndex, unsigned short & result)
 {
 	std::map<PackedVertex, unsigned short>::iterator it = vertexToOutIndex.find(packed);
@@ -563,7 +644,18 @@ bool Model::_getSimilarVertexIndex_fast(PackedVertex & packed, std::map<PackedVe
 	return true;
 }
 
-void Model::_indexVBO(std::vector<glm::vec3>& in_vertics, std::vector<glm::vec2>& in_uvs, std::vector<glm::vec3>& in_normals, std::vector<unsigned short>& out_indices, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals)
+void Model::_indexVBO(std::vector<glm::vec3>& in_vertics,
+	std::vector<glm::vec2>& in_uvs,
+	std::vector<glm::vec3>& in_normals,
+	std::vector<glm::vec3>& in_tangents,
+	std::vector<glm::vec3>& in_bitangents,
+
+	std::vector<unsigned short>& out_indices,
+	std::vector<glm::vec3>& out_vertices,
+	std::vector<glm::vec2>& out_uvs,
+	std::vector<glm::vec3>& out_normals,
+	std::vector<glm::vec3>& out_tangents,
+	std::vector<glm::vec3>& out_bitangents)
 {
 
 	std::map<Model::PackedVertex, unsigned short> VertexToOutIndex;
@@ -578,13 +670,17 @@ void Model::_indexVBO(std::vector<glm::vec3>& in_vertics, std::vector<glm::vec2>
 		if (found)
 		{
 			out_indices.push_back(index);
+
+			out_tangents[index] += in_tangents[i];
+			out_bitangents[index] += in_bitangents[i];
 		}
 		else
 		{
 			out_vertices.push_back(in_vertics[i]);
 			out_uvs.push_back(in_uvs[i]);
 			out_normals.push_back(in_normals[i]);
-			
+			out_tangents.push_back(in_tangents[i]);
+			out_bitangents.push_back(in_bitangents[i]);
 			unsigned short newIndex = (unsigned short)out_vertices.size() - 1;
 			out_indices.push_back(newIndex);
 			VertexToOutIndex[packed] = newIndex;

@@ -3,7 +3,22 @@
 #pragma optimize(off)
 
 layout (location = 0) out vec4 outColor;
+uniform vec3 ambientColor, diffuseColor, specularColor
+unfiorm flaot specularExponent, transparancy, 
 
+/* Things needed for specular lightning:
+NO BUMP ATM
+vec3:
+	ambientColor
+	specularColor
+	diffuseColor
+float:
+	specularExponent
+texture
+	diffuseTexture
+
+
+*/
 in DATA
 {
 	vec4 position;

@@ -1,8 +1,9 @@
 #include "Texture.h"
 
-Texture::Texture(const GLchar * textureSrc)
+Texture::Texture(const GLchar * textureSrc, const GLchar* name)
 {
 	m_Texture = _initBMP(textureSrc);
+	m_Name = name;
 }
 
 Texture::~Texture()
@@ -10,10 +11,13 @@ Texture::~Texture()
 	GLCall(glDeleteTextures(1, &m_Texture));
 }
 
-void Texture::bind(const GLenum & textureUnit)
+void Texture::bind(Shader* shaderProgram, const int textureNr)
 {
-	GLCall(glActiveTexture(textureUnit));
+	GLuint textureId;
+	GLCall(textureId = glGetUniformLocation(shaderProgram->getProgram(), m_Name))
+	GLCall(glActiveTexture(GL_TEXTURE0 + textureNr));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture));
+	GLCall(glUniform1i(textureId, textureNr));
 }
 
 void Texture::unbind()

@@ -2,18 +2,20 @@
 #define TEXTURE_H
 
 #include <GL\glew.h>
+#include "Shader.h"
 #include "OpenGLError.h"
 
 class Texture
 {
 private:
 	GLuint m_Texture;
+	const GLchar* m_Name;
 
 public:
-	Texture(const GLchar* textureSrc);
+	Texture(const GLchar * textureSrc, const GLchar* name);
 	~Texture();
 
-	void bind(const GLenum& textureUnit);
+	void bind(Shader* shader, const int textureNr);
 	void unbind();
 
 private:

@@ -16,7 +16,7 @@ TextureCube::TextureCube(float x, float y, float z, const GLchar * texture)
 	_initShaders(cubeTexShaders);
 	_initTextureCube();
 	
-	m_Texture = new Texture(texture);
+	m_Texture = new Texture(texture, "texture");
 
 }
 
@@ -27,7 +27,7 @@ TextureCube::~TextureCube()
 
 void TextureCube::prepare()
 {
-	m_Texture->bind(GL_TEXTURE0);
+	m_Texture->bind(m_pShaderProgram,0);
 	m_pShaderProgram->bind();
 	m_VertexArray.bind();
 	m_IndexBuffer->bind();

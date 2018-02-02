@@ -131,6 +131,24 @@ void Shader::setUniformMat4f(const GLchar * uniform, glm::mat4 mat)
 	//unbind();
 }
 
+void Shader::setUniform3f(const GLchar * uniform, glm::vec3 vector)
+{
+	bind();
+
+	GLint location;
+	GLCall(location = glGetUniformLocation(m_Program, uniform));
+	GLCall(glUniform3f(location, vector.x, vector.y, vector.z));
+}
+
+void Shader::setUniform2f(const GLchar * uniform, glm::vec2 vector)
+{
+	bind();
+
+	GLint location;
+	GLCall(location = glGetUniformLocation(m_Program, uniform));
+	GLCall(glUniform2f(location, vector.x, vector.y));
+}
+
 void Shader::bind()
 {
 	GLCall(glUseProgram(m_Program));

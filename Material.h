@@ -4,6 +4,7 @@
 #include <GL\glew.h>
 #include <glm.hpp>
 #include "Texture.h"
+#include "Shader.h"
 
 class Material
 {
@@ -28,23 +29,44 @@ private:
 	float m_SurfaceDensity;
 	//map_Kd(Texture)
 	Texture* m_DiffuseMapTexture;
+	//map_Ka 
+	Texture* m_AmbientTexture;
+	//map_Ks
+	Texture* m_SpecularTexture;
+	//map_Bump
+	Texture* m_BumpTexture;
+
 
 public:
 	Material(const char* name);
 	~Material();
 	
-	void bind();
+	void bind(Shader* shader);
 	void unbind();
 	
+	// Ambient 
 	inline void setAmbientColor(float r, float g, float b) { m_AmbientColor = glm::vec3(r, g, b); }
+	void setAmbientMap(const char* ambientMap);
+	
+	// Diffuse
 	inline void setDiffuseColor(float r, float g, float b) { m_DiffuseColor = glm::vec3(r, g, b); }
+	void setDiffuseMap(const char* diffuseMap);
+	
+	// Specular
 	inline void setSpecularColor(float r, float g, float b) { m_SpecularColor = glm::vec3(r, g, b); }
 	inline void setSpecularExponent(float exp) { m_SpecularExponent = exp; }
+	void setSpecularMap(const char* specularMap);
+
+	// Bump Map
+	void setBumpMap(const char* bumpMap);
+
 	inline void setTranspararacy(float trans) { m_Transparacy = trans; }
+
 	inline void setIllumMode(int mode) { m_IllumMode = mode; }
+
 	inline void setTransmissionFilter(float r, float g, float b) { m_TransmissionFilter = glm::vec3(r, g, b); }
+
 	inline void setSurfaceDensity(float density) { m_SurfaceDensity = density; }
-	void setDiffuseMap(const char* diffuseMap);
 
 	inline const char* getName() const { return m_Name; }
 
