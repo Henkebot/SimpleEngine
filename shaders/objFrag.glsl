@@ -7,15 +7,9 @@ uniform sampler2D specularTexture;
 uniform sampler2D bumpMap;
 
 uniform vec3 Light_pos;
-
-struct Materials
-{
-	vec3 ambientColor;
-	vec3 diffuseColor;
-	vec3 specularColor;
-};
-
-uniform Materials material;
+uniform vec3 specularColor;
+uniform vec3 diffuseColor;
+uniform vec3 ambientColor;
 
 in DATA
 {
@@ -32,14 +26,14 @@ in DATA
 void main()
 {
 
-	vec3 LightColor = vec3(1,1,0);
-	float lightPower = 20.0f;
+	vec3 LightColor = vec3(1,1,1);
+	float lightPower =200.0f;
 
-	vec3 MaterialDiffuseColor = texture(diffuseTexture, fs_in.uvs).rgb * 0.64;
-	vec3 MaterialAmbientColor = texture(ambientTexture, fs_in.uvs).rgb * 0;
-	vec3 MaterialSpecularColor = texture(specularTexture, fs_in.uvs).rgb * 0.5;
+	vec3 MaterialDiffuseColor = texture(diffuseTexture, fs_in.uvs).rgb;
+	vec3 MaterialAmbientColor = texture(ambientTexture, fs_in.uvs).rgb * 0.1;
+	vec3 MaterialSpecularColor = texture(specularTexture, fs_in.uvs).rgb;
 
-	vec3 TextureNormal_tangentSpace = normalize(texture( bumpMap, fs_in.uvs).rgb *2.0 - 1.0);
+	vec3 TextureNormal_tangentSpace = normalize(texture( bumpMap, vec2(fs_in.uvs.x,-fs_in.uvs.y) ).rgb *2.0 - 1.0);
 	
 	float distance = length(Light_pos - fs_in.pos);
 
@@ -52,7 +46,7 @@ void main()
 	float cosAlpha = clamp(dot(E,R), 0, 1);
 
 	vec3 finalColor = MaterialAmbientColor +
-					(MaterialDiffuseColor * vec3(1,1,1) *LightColor* lightPower * cosTheta / (distance*distance) )+
-					(MaterialSpecularColor * vec3(1,1,1) *LightColor* lightPower * pow(cosAlpha,5) / (distance*distance));
+					(MaterialDiffuseColor * LightColor* lightPower * cosTheta / (distance*distance) )+
+					(MaterialSpecularColor * LightColor* lightPower * pow(cosAlpha,96) / (distance*distance));
 	outColor = vec4(finalColor,1.0);
 }

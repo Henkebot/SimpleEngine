@@ -30,10 +30,10 @@ main
 	static const glm::mat4 projection = glm::perspective(70.0f, aspect, 0.01f, 200.0f);
 
 	nano.getShader()->setUniformMat4f("Projection", projection);
-	nano.getShader()->setUniformMat4f("World", glm::scale(glm::translate(glm::vec3(0,1,0)),glm::vec3(1.0f, 1.0f, 1.0f)));
+	nano.getShader()->setUniformMat4f("World", glm::scale(glm::translate(glm::vec3(0,1,0)),glm::vec3(1, 1, 1)));
 
 	//----Light
-	LightBill light(0, 20, 0);
+	LightBill light(0, 15, 10);
 
 	//----Skybox
 	Skybox box("res/skyboxes/Skybox2/skybox", GL_TEXTURE0);

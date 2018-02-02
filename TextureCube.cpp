@@ -16,7 +16,7 @@ TextureCube::TextureCube(float x, float y, float z, const GLchar * texture)
 	_initShaders(cubeTexShaders);
 	_initTextureCube();
 	
-	m_Texture = new Texture(texture, "texture");
+	m_Texture = new Texture(texture, "texture", BMP);
 
 }
 

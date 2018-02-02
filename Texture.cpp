@@ -1,8 +1,11 @@
 #include "Texture.h"
 
-Texture::Texture(const GLchar * textureSrc, const GLchar* name)
+Texture::Texture(const GLchar * textureSrc, const GLchar* name, TYPE type)
 {
-	m_Texture = _initBMP(textureSrc);
+	if(type == BMP)
+		m_Texture = _initBMP(textureSrc);
+	else if(type == PNG)
+		m_Texture = _initPNG(textureSrc);
 	m_Name = name;
 }
 
@@ -63,7 +66,6 @@ GLuint Texture::_initBMP(const GLchar * textureSrc)
 	// Sometimes the BMP files are misformatted, time to guess information!
 	if (imageSize == 0) imageSize = width * height * 3;
 	if (dataPos == 0) dataPos = 54;
-
 	data = new unsigned char[imageSize];
 	fread(data, 1, imageSize, file);
 	fclose(file);
@@ -84,4 +86,30 @@ GLuint Texture::_initBMP(const GLchar * textureSrc)
 	delete data;
 	return texture;
 
+}
+
+GLuint Texture::_initPNG(const GLchar * textureSrc)
+{
+	std::cout << "\tReading png (" << textureSrc << ")...";
+	std::vector<unsigned char> image;
+	unsigned int width, height;
+	unsigned error = lodepng::decode(image, width, height, textureSrc);
+	if (error != 0)
+	{
+		std::cout << "\nerror " << error << ": " << lodepng_error_text(error) << std::endl;
+	}
+	GLuint texture;
+	GLCall(glGenTextures(1, &texture));
+	GLCall(glBindTexture(GL_TEXTURE_2D, texture));
+
+
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+
+	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]));
+	GLCall(glGenerateMipmap(GL_TEXTURE_2D));
+	std::cout << "Done!\n";
+	return texture;
 }

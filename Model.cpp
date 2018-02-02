@@ -148,6 +148,8 @@ Model::~Model()
 	for (auto& vertx : m_Vaos)
 		delete vertx;
 
+
+	// Safely delete materials if there are copies
 	for (int i = 0; i < m_Materials.size(); i++)
 	{
 		bool found = false;
@@ -157,8 +159,14 @@ Model::~Model()
 			if (found) break;
 		}
 		if (!found)
+		{
 			delete m_Materials.at(i);
+			m_Materials.erase(m_Materials.begin() + i);
+			i = 0;
+		}
 	}
+
+
 }
 
 Shader * Model::getShader()
@@ -242,8 +250,9 @@ std::vector<Material*> Model::_getMaterialsFromFile(const char * path, const cha
 
 		if (strcmp("newmtl", line) == 0)
 		{
-			char* name = new char[128];
-			fscanf_s(mttlibFile, "%s", name, 128);	
+			char* name = new char[64];
+			fscanf_s(mttlibFile, "%s", name, 64);	
+			std::cout << "Model:Mttlib: Reading (" << name << ")\n";
 			materials.push_back(new Material(name));
 		}
 		else if (strcmp("Ns", line) == 0)
@@ -571,7 +580,6 @@ bool Model::_loadObjContinoues(FILE* file,
 			// If we have been reading faces and now hit a blank line does that mean that we are done with this mesh
 			if (loadFace)
 			{
-				std::cout << mtlName << ": We hit the spot now reset and read the other" << std::endl;
 				break;
 			}
 			char stupidBuffer[1000];

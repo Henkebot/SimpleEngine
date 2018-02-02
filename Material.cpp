@@ -11,9 +11,12 @@ Material::Material(const char* name)
 
 Material::~Material()
 {
-	delete m_DiffuseMapTexture;
-    delete[] m_Name;
-
+	if(m_DiffuseMapTexture)delete m_DiffuseMapTexture;
+	if (m_AmbientTexture) delete m_AmbientTexture;
+	if (m_SpecularTexture) delete m_SpecularTexture;
+	if (m_BumpTexture) delete m_BumpTexture;
+    
+	delete m_Name;
 }
 
 void Material::bind(Shader* shader)
@@ -21,24 +24,20 @@ void Material::bind(Shader* shader)
 	int materialNr = 0;
 	m_DiffuseMapTexture->bind(shader, materialNr++);
 
-	m_AmbientTexture->bind(shader, materialNr++);
+	if(m_AmbientTexture)
+		m_AmbientTexture->bind(shader, materialNr++);
 
 	if (m_SpecularTexture)
 		m_SpecularTexture->bind(shader, materialNr++);
-	else
-	{
-		m_SpecularTexture = m_AmbientTexture;
-		m_SpecularTexture->bind(shader, materialNr++);
-	}
 
 	if (m_BumpTexture)
 	{
 		m_BumpTexture->bind(shader, materialNr++);
 	}
 
-	shader->setUniform3f("Materials.ambientColor", m_AmbientColor);
-	shader->setUniform3f("Materials.diffuseColor", m_DiffuseColor);
-	shader->setUniform3f("Materials.specularColor", m_SpecularColor);
+	shader->setUniform3f("ambientColor", m_AmbientColor);
+	shader->setUniform3f("diffuseColor", m_DiffuseColor);
+	shader->setUniform3f("specularColor", m_SpecularColor);
 
 }
 
@@ -49,22 +48,22 @@ void Material::unbind()
 
 void Material::setAmbientMap(const char * ambientMap)
 {
-	m_AmbientTexture = new Texture(ambientMap, "ambientTexture");
+	m_AmbientTexture = new Texture(ambientMap, "ambientTexture", PNG);
 }
 
 void Material::setDiffuseMap(const char * diffuseMap)
 {
-	m_DiffuseMapTexture = new Texture(diffuseMap, "diffuseTexture");
+	m_DiffuseMapTexture = new Texture(diffuseMap, "diffuseTexture", PNG);
 }
 
 void Material::setSpecularMap(const char * specularMap)
 {
-	m_SpecularTexture = new Texture(specularMap, "specularTexture");
+	m_SpecularTexture = new Texture(specularMap, "specularTexture", PNG);
 }
 
 void Material::setBumpMap(const char * bumpMap)
 {
-	m_BumpTexture = new Texture(bumpMap, "bumpMap");
+	m_BumpTexture = new Texture(bumpMap, "bumpMap", PNG);
 }
 
 bool Material::operator==(const Material & other) const
