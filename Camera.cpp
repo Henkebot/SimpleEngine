@@ -31,7 +31,7 @@ const glm::mat4 Camera::getViewMatrix() const
 {
 	return glm::lookAt(m_Position, m_Position + m_Target, m_Up);
 }
-
+#include <GL\glew.h>
 void Camera::update(double xMouse, double yMouse)
 {
 	static float stepSize = 0.2f;
@@ -61,6 +61,24 @@ void Camera::update(double xMouse, double yMouse)
 		right = glm::normalize(right);
 		right *= stepSize;
 		m_Position += right;
+	}
+
+	if (GetAsyncKeyState(int('O')))
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	if (GetAsyncKeyState(int('P')))
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
+	if (GetAsyncKeyState(int('C')))
+	{
+		glEnable(GL_CULL_FACE);
+	}
+	if (GetAsyncKeyState(int('V')))
+	{
+		glDisable(GL_CULL_FACE);
 	}
 
 	float xOffset = xMouse - m_MousePos.x;

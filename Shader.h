@@ -26,6 +26,7 @@ public:
 	void setUniformMat4f(const GLchar* uniform, glm::mat4 mat);
 	void setUniform3f(const GLchar* uniform, glm::vec3 vector);
 	void setUniform2f(const GLchar* uniform, glm::vec2 vector);
+	void setUniform1f(const GLchar* uniform, float value);
 
 
 	void bind();

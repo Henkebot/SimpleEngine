@@ -23,13 +23,12 @@ Skybox::~Skybox()
 void Skybox::render(const Camera & camera)
 {
 	glDisable(GL_DEPTH_TEST);
-	static float x = 0.1f;
-	x += 0.0001f;
+	
 	m_pShader->bind();
 	m_Vao.bind();
 	m_pIndexBuffer->bind();
 	m_pShader->setUniformMat4f("View", camera.getViewMatrix());
-	m_pShader->setUniformMat4f("World", glm::rotate(glm::translate(camera.getPos()),x, glm::vec3(0, 1, 0)));
+	m_pShader->setUniformMat4f("World", glm::translate(camera.getPos()));
 
 	glDrawElements(GL_TRIANGLES, m_pIndexBuffer->getIndices(), GL_UNSIGNED_SHORT, 0);
 

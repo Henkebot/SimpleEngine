@@ -7,47 +7,34 @@ layout(location = 4) in vec3 in_bitangents;
 
 
 uniform mat4 Projection, View, World;
-uniform vec3 Light_pos;
+uniform vec3 Light_pos, Camera_Pos;
 
 out DATA
 {
 	vec3 pos;
 	vec2 uvs;
-	vec3 normals;
-	vec3 lightDir;
-	vec3 cameraDir;
+	vec3 TangentLightPos;
+	vec3 TangentViewPos;
+	vec3 TangentFragPos;
 
-	vec3 lightDir_tangentSpace;
-	vec3 cameraDir_tangentSpace;
 } vs_out;
 
 
 void main()
 {
 	vs_out.uvs = in_uvs;
-	vs_out.normals = in_normals;
 	vs_out.pos = (World * vec4(in_pos,1.0f)).xyz;
-	vec3 vertexPosition_cameraSpace = (View * vec4(vs_out.pos,1)).xyz;
-	vs_out.cameraDir = vec3(0,0,0) - vertexPosition_cameraSpace;
 
-	vec3 LightPosition_cameraSpace = (View * vec4(Light_pos,1)).xyz;
-	vs_out.lightDir = LightPosition_cameraSpace + vs_out.cameraDir;
-
-	mat3 MV3x3 = mat3(View*World);
-
-	vec3 vertexTangent_cameraSpace = MV3x3 * in_tangents;
-	vec3 vertexBitangent_cameraSpace = MV3x3 * in_bitangents;
-	vec3 vertexNormal_cameraSpace = MV3x3 * in_normals;
-
-	mat3 TBN = transpose(mat3(
-		vertexTangent_cameraSpace,
-		vertexBitangent_cameraSpace,
-		vertexNormal_cameraSpace
-	));
-
-
-	vs_out.lightDir_tangentSpace = TBN * vs_out.lightDir;
-	vs_out.cameraDir_tangentSpace = TBN * vs_out.cameraDir;
+	mat3 normalMatrix = transpose(inverse(mat3(World)));
+	vec3 T = normalize(normalMatrix * in_tangents);
+	vec3 N = normalize(normalMatrix * in_normals);
+	T = normalize(T - dot(T,N) * N);
+	vec3 B = cross(N,T);
+	
+	mat3 TBN = transpose(mat3(T,B,N));
+	vs_out.TangentLightPos = TBN * Light_pos;
+	vs_out.TangentViewPos = TBN * Camera_Pos;
+	vs_out.TangentFragPos = TBN * vs_out.pos;
 
 	gl_Position = Projection * View * vec4(vs_out.pos,1.0f);
 }

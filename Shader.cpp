@@ -149,6 +149,15 @@ void Shader::setUniform2f(const GLchar * uniform, glm::vec2 vector)
 	GLCall(glUniform2f(location, vector.x, vector.y));
 }
 
+void Shader::setUniform1f(const GLchar * uniform, float value)
+{
+	bind();
+
+	GLint location;
+	GLCall(location = glGetUniformLocation(m_Program, uniform));
+	GLCall(glUniform1f(location, value));
+}
+
 void Shader::bind()
 {
 	GLCall(glUseProgram(m_Program));
