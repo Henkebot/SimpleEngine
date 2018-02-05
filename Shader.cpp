@@ -35,7 +35,8 @@ GLuint Shader::loadShaders(ShaderInfo * shaders)
 
 	while (entry->type != GL_NONE)
 	{
-		GLuint shader = glCreateShader(entry->type);
+		GLuint shader;
+		GLCall(shader = glCreateShader(entry->type));
 		entry->shader = shader;
 
 		const GLchar* shaderSource = readShader(entry->fileName);
@@ -105,7 +106,7 @@ GLuint Shader::loadShaders(ShaderInfo * shaders)
 		glDeleteShader(entry->shader);
 		entry->shader = 0;
 	}
-
+	std::cout << "Shader Compile OK!" << std::endl;
 	return program;
 }
 
@@ -120,6 +121,15 @@ Shader::~Shader()
 	GLCall(glUseProgram(0));
 }
 
+void Shader::setUniformMat3f(const GLchar * uniform, glm::mat3 mat)
+{
+	bind();
+
+	GLint location;
+	GLCall(location = glGetUniformLocation(m_Program, uniform));
+	GLCall(glUniformMatrix3fv(location, 1, GL_FALSE, &mat[0][0]));
+}
+
 void Shader::setUniformMat4f(const GLchar * uniform, glm::mat4 mat)
 {
 	bind();
@@ -129,6 +139,14 @@ void Shader::setUniformMat4f(const GLchar * uniform, glm::mat4 mat)
 	GLCall(glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]));
 
 	//unbind();
+}
+
+void Shader::setUniform4f(const GLchar * uniform, glm::vec4 vec)
+{
+	bind();
+	GLint location;
+	GLCall(location = glGetUniformLocation(m_Program, uniform));
+	glUniform4f(location, vec.x, vec.y, vec.z, vec.w);
 }
 
 void Shader::setUniform3f(const GLchar * uniform, glm::vec3 vector)
@@ -156,6 +174,15 @@ void Shader::setUniform1f(const GLchar * uniform, float value)
 	GLint location;
 	GLCall(location = glGetUniformLocation(m_Program, uniform));
 	GLCall(glUniform1f(location, value));
+}
+
+void Shader::setUniform1i(const GLchar * unifom, int value)
+{
+	bind();
+
+	GLint location;
+	GLCall(location = glGetUniformLocation(m_Program, unifom));
+	GLCall(glUniform1i(location, value));
 }
 
 void Shader::bind()
