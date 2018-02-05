@@ -28,6 +28,7 @@ public:
 	const glm::vec3 getUp() const;
 
 	const glm::mat4 getViewMatrix() const;
+	bool isCameraMoved() const;
 
 	void update(double xMouse, double yMouse);
 

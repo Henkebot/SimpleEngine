@@ -31,11 +31,33 @@ const glm::mat4 Camera::getViewMatrix() const
 {
 	return glm::lookAt(m_Position, m_Position + m_Target, m_Up);
 }
+bool Camera::isCameraMoved() const
+{
+	static glm::vec2 lastMousePos = m_MousePos;
+	if (lastMousePos != m_MousePos)
+	{
+		lastMousePos = m_MousePos;
+		return true;
+	}
+	return false;
+}
 #include <GL\glew.h>
 void Camera::update(double xMouse, double yMouse)
 {
 	static float stepSize = 0.2f;
 	const static int MARGIN = 10;
+
+	if (GetAsyncKeyState(VK_SHIFT))
+	{
+		stepSize = 1.5f;
+	}
+	if (!GetAsyncKeyState(VK_SHIFT))
+	{
+		stepSize -= 0.1f;
+		
+		if(stepSize <= 0.2f)
+			stepSize = 0.2f;
+	}
 
 	if (GetAsyncKeyState(int('W')))
 	{
