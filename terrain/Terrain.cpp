@@ -56,8 +56,8 @@ bool Terrain::_checkDivide(TerrainNode * node)
 {
 	float distance = abs(
 		sqrt(
-			pow((m_pCamera->getPos().x*2) - node->origin.x, 2.0) +
-			pow((m_pCamera->getPos().z*2) - node->origin.z, 2.0)
+			pow((m_pCamera->getPos().x) - node->origin.x, 2.0) +
+			pow((m_pCamera->getPos().z) - node->origin.z, 2.0)
 		)
 	);
 
@@ -311,7 +311,7 @@ void Terrain::_initGraphics()
 	{
 		_loadTextureMipmap(GL_TEXTURE0, 0, 5, scene.heightMap, "TexTerrainHeight");
 	}
-	_loadTextureMipmap(GL_TEXTURE1, 1, 5, scene.heightMap, "TexTerrainHeight2");
+	_loadTextureMipmap(GL_TEXTURE1, 1, 5, scene.tex1.colorMap, "TexTerrainTexture");
 
 	m_pShader->setUniform1f("TerrainLength", scene.terrainLength);
 	m_pShader->setUniform1f("TerrainWidth", scene.terrainWidth);

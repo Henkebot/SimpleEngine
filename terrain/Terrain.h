@@ -5,7 +5,7 @@
 #include "../Camera.h"
 #include "../VertexArray.h"
 #include "../IndexBuffer.h"
-#define MAX_TERRAIN_NODES 500
+#define MAX_TERRAIN_NODES 1000
 #define VMB_TERRAIN_REC_CUTOFF 100
 class Terrain
 {

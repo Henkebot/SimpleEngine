@@ -12,6 +12,7 @@ uniform	mat3 nMatrix;
 uniform float tileScale;
 uniform float ToggleWireframe;
 uniform sampler2D TexTerrainHeight;
+uniform sampler2D TexTerrainTexture;
 
 //
 // Inputs
@@ -28,7 +29,7 @@ layout(location = 0, index = 0) out vec4 fragColor;
 void main(void)
 {
 	//vec4 color = vec4(mix(0.0, 1.0, tileScale / 1000.0), mix(1.0, 0.0, tileScale / 1000.0), 0.0, 1.0);
-	vec4 color = texture(TexTerrainHeight, gs_terrainTexCoord);
+	vec4 color = texture(TexTerrainTexture, gs_terrainTexCoord);
 
 	// Wireframe junk
 	float d = min(gs_edgeDist.x, gs_edgeDist.y);

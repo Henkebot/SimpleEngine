@@ -90,6 +90,7 @@ Model::Model(const char * path, const char * objname, int lol)
 		// Find that material which is being used in the mesh
 		for (int i = 0; i < materials.size(); i++)
 		{
+			if (name == NULL) break;
 			if (strcmp(name, materials.at(i)->getName()) == 0)
 			{
 				m_Materials.push_back(materials.at(i));
