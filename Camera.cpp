@@ -49,11 +49,11 @@ void Camera::update(double xMouse, double yMouse)
 
 	if (GetAsyncKeyState(VK_SHIFT))
 	{
-		stepSize = 3.0f;
+		stepSize = 16.0f;
 	}
 	if (!GetAsyncKeyState(VK_SHIFT))
 	{
-		stepSize -= 0.1f;
+		stepSize = stepSize*0.75f;
 		
 		if(stepSize <= 0.2f)
 			stepSize = 0.2f;

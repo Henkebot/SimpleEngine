@@ -22,6 +22,7 @@ uniform float tscale_posz;
 // Inputs
 //
 in vec2 vs_terrainTexCoord[];
+in vec2 vs_patchTexCoord[];
 
 //
 // Outputs
@@ -32,6 +33,7 @@ patch out float gl_TessLevelOuter[4];
 patch out float gl_TessLevelInner[2];
 
 out vec2 tcs_terrainTexCoord[];
+out vec2 tcs_patchTexCoord[];
 out float tcs_tessLevel[];
 
 /**
@@ -54,7 +56,7 @@ float dlodCameraDistance(vec4 p0, vec4 p1, vec2 t0, vec2 t1)
 	float d1 = clamp((abs(p1.z) - MinDepth) / (MaxDepth - MinDepth), 0.0, 1.0);
 
 	float t = mix(64, 2, (d0 + d1) * 0.5);
-
+	
 	if (t <= 2.0)
 	{
 		return 2.0;
@@ -106,6 +108,7 @@ void main(void)
 
 	// Output heightmap coordinates
 	tcs_terrainTexCoord[gl_InvocationID] = vs_terrainTexCoord[gl_InvocationID];
+	tcs_patchTexCoord[gl_InvocationID] = vs_patchTexCoord[gl_InvocationID];
 
 	// Output tessellation level (used for wireframe coloring)
 	tcs_tessLevel[gl_InvocationID] = gl_TessLevelOuter[0];

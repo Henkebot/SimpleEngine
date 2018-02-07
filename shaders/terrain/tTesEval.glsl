@@ -24,12 +24,14 @@ patch in float gl_TessLevelOuter[4];
 patch in float gl_TessLevelInner[2];
 
 in vec2 tcs_terrainTexCoord[];
+in vec2 tcs_patchTexCoord[];
 in float tcs_tessLevel[];
 
 //
 // Outputs
 //
 out vec2 tes_terrainTexCoord;
+out vec2 tes_patchTexCoord;
 out float tes_tessLevel;
 
 
@@ -55,7 +57,7 @@ void main()
 
 	// Terrain heightmap coords
 	vec2 terrainTexCoord = interpolate2(tcs_terrainTexCoord[0], tcs_terrainTexCoord[1], tcs_terrainTexCoord[2], tcs_terrainTexCoord[3]);
-
+	tes_patchTexCoord = interpolate2(tcs_patchTexCoord[0], tcs_patchTexCoord[1], tcs_patchTexCoord[2], tcs_patchTexCoord[3]);
 	// Sample the heightmap and offset y position of vertex
 	vec4 samp = texture(TexTerrainHeight, terrainTexCoord);
 	vec4 samp2 = texture(TexTerrainHeight2, terrainTexCoord);

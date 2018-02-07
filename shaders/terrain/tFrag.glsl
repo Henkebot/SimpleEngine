@@ -20,6 +20,7 @@ uniform sampler2D TexTerrainTexture;
 in vec4 gs_wireColor;
 noperspective in vec3 gs_edgeDist;
 in vec2 gs_terrainTexCoord;
+in vec2 gs_patchTexCoord;
 
 //
 // Ouputs
@@ -29,7 +30,7 @@ layout(location = 0, index = 0) out vec4 fragColor;
 void main(void)
 {
 	//vec4 color = vec4(mix(0.0, 1.0, tileScale / 1000.0), mix(1.0, 0.0, tileScale / 1000.0), 0.0, 1.0);
-	vec4 color = texture(TexTerrainTexture, gs_terrainTexCoord);
+	vec4 color = texture(TexTerrainTexture, gs_patchTexCoord);
 
 	// Wireframe junk
 	float d = min(gs_edgeDist.x, gs_edgeDist.y);

@@ -304,6 +304,7 @@ void Terrain::_initGraphics()
 	GLushort quadPatchIndices[] = { 0, 1, 2, 3 };
 
 	m_Vao.addBuffer(new Buffer(quadVert, sizeof(quadVert), 4), 0);
+	m_Vao.addBuffer(new Buffer(quadUVs, sizeof(quadUVs), 2), 1);
 	m_IndexBuffer = new IndexBuffer(quadPatchIndices, sizeof(quadPatchIndices));
 
 	// TEXTURE SETUP
@@ -311,7 +312,7 @@ void Terrain::_initGraphics()
 	{
 		_loadTextureMipmap(GL_TEXTURE0, 0, 5, scene.heightMap, "TexTerrainHeight");
 	}
-	_loadTextureMipmap(GL_TEXTURE1, 1, 5, scene.tex1.colorMap, "TexTerrainTexture");
+	_loadTextureMipmap(GL_TEXTURE1, 1, 5, scene.texBase.colorMap, "TexTerrainTexture");
 
 	m_pShader->setUniform1f("TerrainLength", scene.terrainLength);
 	m_pShader->setUniform1f("TerrainWidth", scene.terrainWidth);

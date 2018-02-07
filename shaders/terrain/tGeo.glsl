@@ -17,6 +17,7 @@ uniform	mat3 nMatrix;
 //
 layout(triangles) in;
 in vec2 tes_terrainTexCoord[];
+in vec2 tes_patchTexCoord[];
 in float tes_tessLevel[];
 
 //
@@ -27,6 +28,7 @@ layout(triangle_strip, max_vertices = 4) out;
 out vec4 gs_wireColor;
 noperspective out vec3 gs_edgeDist;
 out vec2 gs_terrainTexCoord;
+out vec2 gs_patchTexCoord;
 
 vec4 wireframeColor()
 {
@@ -73,6 +75,7 @@ void main(void)
 	{
 		gl_Position = gl_in[i].gl_Position;
 		gs_terrainTexCoord = tes_terrainTexCoord[i];
+		gs_patchTexCoord = tes_patchTexCoord[i];
 		gs_wireColor = wireColor;
 
 		if (i == 0)
@@ -89,6 +92,7 @@ void main(void)
 	gl_Position = gl_in[0].gl_Position;
 	gs_edgeDist = vec3(ha, 0, 0);
 	gs_terrainTexCoord = tes_terrainTexCoord[0];
+	gs_patchTexCoord = tes_patchTexCoord[0];
 	gs_wireColor = wireColor;
 	EmitVertex();
 

@@ -42,12 +42,6 @@ void what(vec2 texCoord, vec4 vPos)
 {
 	vec4 samp = 2.0 * texture(TexTerrainNormal, texCoord) - 1.0;
 
-	/*vec3 tnorm = normalize(nMatrix * vec3(samp));
-	vec4 eyeCoords = mvMatrix * vPos;
-	vec3 s = normalize(vec3(LightOrigin - eyeCoords));
-
-	tes_lightIntensity = LightColor * max(dot(s, tnorm), 0.0);*/
-
 	vec3 tnorm = normalize(samp).xyz;
 	vec4 worldCoords = mMatrix * vPos;
 	vec3 s = normalize(vec3(LightOrigin) * -1);

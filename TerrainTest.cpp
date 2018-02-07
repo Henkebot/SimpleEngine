@@ -11,14 +11,6 @@ main
 	//----Skybox
 	Skybox box("res/skyboxes/Skybox2/skybox", GL_TEXTURE7);
 	Terrain terrain("res/terrains/terrain2/terrainSettings.txt", &camera);
-
-	ShaderInfo shaders[] =
-	{
-		{GL_VERTEX_SHADAER, "plats" },
-		{GL_FRAGMENT_SHADAER, "plats}
-	};
-
-	Shader shader;
 	while (window.closed())
 	{
 		window.clear();
