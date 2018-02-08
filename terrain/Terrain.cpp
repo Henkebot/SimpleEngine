@@ -296,9 +296,9 @@ void Terrain::_initGraphics()
 	
 	float quadUVs[] =
 	{
-		0.0f, 2.0f,					// Tex coord (u,v)
-		2.0f, 2.0f,					// Tex coord (u,v)
-		2.0f, 0.0f,					// Tex coord (u,v)
+		0.0f, 1.0f,					// Tex coord (u,v)
+		1.0f, 1.0f,					// Tex coord (u,v)
+		1.0f, 0.0f,					// Tex coord (u,v)
 		0.0f, 0.0f,					// Tex coord (u,v)
 	};
 	GLushort quadPatchIndices[] = { 0, 1, 2, 3 };
@@ -312,13 +312,19 @@ void Terrain::_initGraphics()
 	{
 		_loadTextureMipmap(GL_TEXTURE0, 0, 5, scene.heightMap, "TexTerrainHeight");
 	}
-	_loadTextureMipmap(GL_TEXTURE1, 1, 5, scene.texBase.colorMap, "TexTerrainTexture");
+	_loadTextureMipmap(GL_TEXTURE1, 1, scene.texBase.mipLevels, scene.texBase.colorMap, "TexBase");
+	_loadTextureMipmap(GL_TEXTURE2, 2, scene.tex0.mipLevels, scene.tex0.colorMap, "Tex0");
+	_loadTextureMipmap(GL_TEXTURE3, 3, scene.tex1.mipLevels, scene.tex1.colorMap, "Tex1");
+	_loadTextureMipmap(GL_TEXTURE4, 4, scene.tex2.mipLevels, scene.tex2.colorMap, "Tex2");
+	_loadTextureMipmap(GL_TEXTURE5, 5, scene.tex3.mipLevels, scene.tex3.colorMap, "Tex3");
 
 	m_pShader->setUniform1f("TerrainLength", scene.terrainLength);
 	m_pShader->setUniform1f("TerrainWidth", scene.terrainWidth);
 	m_pShader->setUniform3f("TerrainOrigin", glm::vec3(-scene.terrainWidth / 2.0f, 0.0, -scene.terrainLength / 2.0f));
 	m_pShader->setUniform1f("TerrainHeightOffset", scene.terrainHeight);
-	
+	m_pShader->setUniform4f("SplatHeightSoft", glm::vec4(scene.tex0.softHeight, scene.tex1.softHeight, scene.tex2.softHeight, scene.tex3.softHeight));
+	m_pShader->setUniform4f("SplatHeightHard", glm::vec4(scene.tex0.hardHeight, scene.tex1.hardHeight, scene.tex2.hardHeight, scene.tex3.hardHeight));
+
 	GLCall(glPatchParameteri(GL_PATCH_VERTICES, 4));
 
 }

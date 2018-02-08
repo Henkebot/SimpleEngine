@@ -14,6 +14,8 @@ uniform sampler2D TexTerrainHeight;
 uniform sampler2D TexTerrainHeight2;
 
 uniform float TerrainHeightOffset;
+uniform vec4 SplatHeightSoft;
+uniform vec4 SplatHeightHard;
 
 //
 // Inputs
@@ -33,6 +35,7 @@ in float tcs_tessLevel[];
 out vec2 tes_terrainTexCoord;
 out vec2 tes_patchTexCoord;
 out float tes_tessLevel;
+out vec4 tes_splatMap;
 
 
 
@@ -58,14 +61,22 @@ void main()
 	// Terrain heightmap coords
 	vec2 terrainTexCoord = interpolate2(tcs_terrainTexCoord[0], tcs_terrainTexCoord[1], tcs_terrainTexCoord[2], tcs_terrainTexCoord[3]);
 	tes_patchTexCoord = interpolate2(tcs_patchTexCoord[0], tcs_patchTexCoord[1], tcs_patchTexCoord[2], tcs_patchTexCoord[3]);
+
 	// Sample the heightmap and offset y position of vertex
 	vec4 samp = texture(TexTerrainHeight, terrainTexCoord);
 	vec4 samp2 = texture(TexTerrainHeight2, terrainTexCoord);
 	gl_Position.y = samp[0] * TerrainHeightOffset;
 
 	// Project the vertex to clip space and send it along
-	gl_Position = pMatrix * mvMatrix * gl_Position;
+
+	// Splat mapping
+	float tex0 = SplatHeightHard[0] == 0 ? 0 : clamp(mix(0.0, 1.0, (gl_Position.y - SplatHeightSoft[0]) / (SplatHeightHard[0] - SplatHeightSoft[0])), 0.0, 1.0);
+	float tex1 = SplatHeightHard[1] == 0 ? 0 : clamp(mix(0.0, 1.0, (gl_Position.y - SplatHeightSoft[1]) / (SplatHeightHard[1] - SplatHeightSoft[1])), 0.0, 1.0);
+	float tex2 = SplatHeightHard[2] == 0 ? 0 : clamp(mix(0.0, 1.0, (gl_Position.y - SplatHeightSoft[2]) / (SplatHeightHard[2] - SplatHeightSoft[2])), 0.0, 1.0);
+	float tex3 = SplatHeightHard[3] == 0 ? 0 : clamp(mix(0.0, 1.0, (gl_Position.y - SplatHeightSoft[3]) / (SplatHeightHard[3] - SplatHeightSoft[3])), 0.0, 1.0);
+	tes_splatMap = vec4(tex0, tex1, tex2, tex3);
 
 	tes_terrainTexCoord = terrainTexCoord;
 	tes_tessLevel = tcs_tessLevel[0];
+	gl_Position = pMatrix * mvMatrix * gl_Position;
 }

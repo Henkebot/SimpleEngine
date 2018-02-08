@@ -19,6 +19,7 @@ layout(triangles) in;
 in vec2 tes_terrainTexCoord[];
 in vec2 tes_patchTexCoord[];
 in float tes_tessLevel[];
+in vec4 tes_splatMap[];
 
 //
 // Outputs
@@ -26,6 +27,7 @@ in float tes_tessLevel[];
 layout(triangle_strip, max_vertices = 4) out;
 
 out vec4 gs_wireColor;
+noperspective out vec4 gs_splatMap;
 noperspective out vec3 gs_edgeDist;
 out vec2 gs_terrainTexCoord;
 out vec2 gs_patchTexCoord;
@@ -74,6 +76,7 @@ void main(void)
 	for (int i = 0; i < gl_in.length(); ++i)
 	{
 		gl_Position = gl_in[i].gl_Position;
+		gs_splatMap = tes_splatMap[i];
 		gs_terrainTexCoord = tes_terrainTexCoord[i];
 		gs_patchTexCoord = tes_patchTexCoord[i];
 		gs_wireColor = wireColor;
@@ -90,6 +93,7 @@ void main(void)
 
 	// This closes the the triangle
 	gl_Position = gl_in[0].gl_Position;
+	gs_splatMap = tes_splatMap[0];
 	gs_edgeDist = vec3(ha, 0, 0);
 	gs_terrainTexCoord = tes_terrainTexCoord[0];
 	gs_patchTexCoord = tes_patchTexCoord[0];
