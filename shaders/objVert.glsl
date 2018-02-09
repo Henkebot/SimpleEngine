@@ -16,6 +16,7 @@ out DATA
 	vec3 TangentLightPos;
 	vec3 TangentViewPos;
 	vec3 TangentFragPos;
+	vec3 normals;
 
 } vs_out;
 
@@ -24,7 +25,8 @@ void main()
 {
 	vs_out.uvs = in_uvs;
 	vs_out.pos = (World * vec4(in_pos,1.0f)).xyz;
-
+	vs_out.normals = in_normals;
+	
 	mat3 normalMatrix = transpose(inverse(mat3(World)));
 	vec3 T = normalize(normalMatrix * in_tangents);
 	vec3 N = normalize(normalMatrix * in_normals);

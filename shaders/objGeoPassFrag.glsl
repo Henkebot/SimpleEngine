@@ -15,6 +15,7 @@ in DATA
 	vec3 TangentLightPos;
 	vec3 TangentViewPos;
 	vec3 TangentFragPos;
+	vec3 normals;
 } fs_in;
 
 void main()
@@ -24,7 +25,7 @@ void main()
 	vec3 normal = texture(bumpMap, fs_in.uvs).rgb;
 	normal = normalize(normal * 2.0 - 1.0);
 
-	gNormal = normal;
+	gNormal = fs_in.normals;
 
 	gColorSpec.rgb = texture(diffuseTexture, fs_in.uvs).rgb;
 

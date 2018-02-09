@@ -1,4 +1,4 @@
-#version 420
+#version 440
 
 //
 // Uniforms
@@ -11,6 +11,7 @@ uniform	mat4 pMatrix;
 uniform	mat4 mvMatrix;
 uniform	mat4 mvpMatrix;
 uniform	mat3 nMatrix;
+uniform vec3 camera_pos;
 
 //
 // Inputs
@@ -72,33 +73,41 @@ void main(void)
 		ha = hb = hc = 0.0;
 	}
 
-	// Output verts
-	for (int i = 0; i < gl_in.length(); ++i)
+	vec4 pos[3] = vec4[](gl_in[0].gl_Position, gl_in[1].gl_Position, gl_in[2].gl_Position);
+	vec3 normal = vec3(cross(pos[1].xyz - pos[0].xyz, pos[2].xyz - pos[0].xyz));
+
+	if (dot(-pos[0].xyz, normal) < 0)
 	{
-		gl_Position = gl_in[i].gl_Position;
-		gs_splatMap = tes_splatMap[i];
-		gs_terrainTexCoord = tes_terrainTexCoord[i];
-		gs_patchTexCoord = tes_patchTexCoord[i];
+
+		// Output verts
+		for (int i = 0; i < gl_in.length(); ++i)
+		{
+			gl_Position = pMatrix * gl_in[i].gl_Position;
+			gs_splatMap = tes_splatMap[i];
+			gs_terrainTexCoord = tes_terrainTexCoord[i];
+			gs_patchTexCoord = tes_patchTexCoord[i];
+			gs_wireColor = wireColor;
+
+			if (i == 0)
+				gs_edgeDist = vec3(ha, 0, 0);
+			else if (i == 1)
+				gs_edgeDist = vec3(0, hb, 0);
+			else
+				gs_edgeDist = vec3(0, 0, hc);
+
+			EmitVertex();
+		}
+
+		// This closes the the triangle
+		gl_Position = pMatrix * gl_in[0].gl_Position;
+		gs_splatMap = tes_splatMap[0];
+		gs_edgeDist = vec3(ha, 0, 0);
+		gs_terrainTexCoord = tes_terrainTexCoord[0];
+		gs_patchTexCoord = tes_patchTexCoord[0];
 		gs_wireColor = wireColor;
-
-		if (i == 0)
-			gs_edgeDist = vec3(ha, 0, 0);
-		else if (i == 1)
-			gs_edgeDist = vec3(0, hb, 0);
-		else
-			gs_edgeDist = vec3(0, 0, hc);
-
 		EmitVertex();
+
+		EndPrimitive();
+
 	}
-
-	// This closes the the triangle
-	gl_Position = gl_in[0].gl_Position;
-	gs_splatMap = tes_splatMap[0];
-	gs_edgeDist = vec3(ha, 0, 0);
-	gs_terrainTexCoord = tes_terrainTexCoord[0];
-	gs_patchTexCoord = tes_patchTexCoord[0];
-	gs_wireColor = wireColor;
-	EmitVertex();
-
-	EndPrimitive();
 }

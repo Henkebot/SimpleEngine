@@ -6,7 +6,8 @@ main
 {
 	Window window("TerrainTest", 1280, 720);
 	window.hideAndGrabMouseMode();
-	
+
+
 	Camera camera(window.getWidth(), window.getHeight(), glm::vec3(0, 0, -1), glm::vec3(0,400,10));
 	//----Skybox
 	Skybox box("res/skyboxes/Skybox2/skybox", GL_TEXTURE7);

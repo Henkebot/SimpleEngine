@@ -129,7 +129,7 @@ Model::Model(const char * path, const char * objname, int lol)
 	ShaderInfo shaders[] =
 	{
 		{ GL_VERTEX_SHADER, "shaders/objVert.glsl" },
-		{ GL_FRAGMENT_SHADER, "shaders/objGeoPassFrag.glsl" },
+		{ GL_FRAGMENT_SHADER, "shaders/objFrag.glsl" },
 		{ GL_NONE, NULL }
 	};
 
@@ -198,7 +198,7 @@ void Model::draw(Shader * shader)
 	{
 		m_Vaos[i]->bind();
 		m_Indexes[i]->bind();
-		m_Materials[i]->bind(m_Shader);
+		m_Materials[i]->bind(shader);
 
 		GLCall(glDrawElements(GL_TRIANGLES, m_Indexes[i]->getIndices() + 1, GL_UNSIGNED_SHORT, NULL));
 

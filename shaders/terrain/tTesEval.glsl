@@ -1,4 +1,4 @@
-#version 420
+#version 440
 
 //
 // Uniforms
@@ -78,5 +78,5 @@ void main()
 
 	tes_terrainTexCoord = terrainTexCoord;
 	tes_tessLevel = tcs_tessLevel[0];
-	gl_Position = pMatrix * mvMatrix * gl_Position;
+	gl_Position = mvMatrix * gl_Position;
 }

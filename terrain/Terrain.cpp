@@ -196,6 +196,7 @@ void Terrain::_renderNode(TerrainNode * node)
 	m_pShader->setUniform1f("tscale_negz", node->tScaleNegZ);
 	m_pShader->setUniform1f("tscale_posx", node->tScalePosX);
 	m_pShader->setUniform1f("tscale_posz", node->tScalePosZ);
+	m_pShader->setUniform3f("camera_pos", m_pCamera->getPos());
 
 	GLCall(glDrawElements(GL_PATCHES, 4, GL_UNSIGNED_SHORT, 0));
 

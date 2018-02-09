@@ -18,6 +18,8 @@ in DATA
 	vec3 TangentLightPos;
 	vec3 TangentViewPos;
 	vec3 TangentFragPos;
+	vec3 normals;
+
 } fs_in;
 
 void main()
@@ -43,10 +45,10 @@ void main()
 	vec3 finalSpecular = vec3(1) * spec;
 
 	float distance = length(fs_in.TangentFragPos - fs_in.TangentLightPos);
-
-	outColor = vec4(MaterialAmbientColor + 
+	outColor = vec4(fs_in.TangentLightPos, 1);
+	/*outColor = vec4(MaterialAmbientColor + 
 					(diffuseFinal * LightColor * lightPower / (distance * distance)) + 
-					(finalSpecular * LightColor * lightPower / (distance * distance)),1.0);
+					(finalSpecular * LightColor * lightPower / (distance * distance)),1.0);*/
 }
 
 /*

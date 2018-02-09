@@ -102,7 +102,7 @@ void Camera::update(double xMouse, double yMouse)
 	{
 		glDisable(GL_CULL_FACE);
 	}
-
+	
 	float xOffset = xMouse - m_MousePos.x;
 	float yOffset = m_MousePos.y - yMouse;
 	m_MousePos.x = xMouse;
@@ -111,7 +111,7 @@ void Camera::update(double xMouse, double yMouse)
 	float sensitivity = 0.1f;
 	xOffset *= sensitivity;
 	yOffset *= sensitivity;
-	
+
 	m_Yaw += xOffset;
 	m_Pitch += yOffset;
 
@@ -119,11 +119,11 @@ void Camera::update(double xMouse, double yMouse)
 		m_Pitch = 89.0f;
 	if (m_Pitch < -89.0f)
 		m_Pitch = -89.0f;
-	
+
 	glm::vec3 front;
 	front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 	front.y = sin(glm::radians(m_Pitch));
 	front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 	m_Target = glm::normalize(front);
-
+	
 }

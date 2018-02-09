@@ -41,11 +41,10 @@ main
 	static const glm::mat4 projection = glm::perspective(70.0f, aspect, 0.01f, 200.0f);
 
 	Model nano("res/Objs/nanosuit", "nanosuit.obj", 1);
-	nano.getShader()->setUniformMat4f("Projection", projection);
-	nano.getShader()->setUniformMat4f("World", glm::scale(glm::translate(glm::vec3(0, 1, 0)), glm::vec3(1, 1, 1)));
-
+	
 	LightBill light(5, 8, 5);
-	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	
 
@@ -155,8 +154,16 @@ main
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		lightPass.bind();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gNormal);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, gColorSpec);
+
+		lightPass.setUniform3f("Light_pos", light.getPosition());
+		lightPass.setUniform3f("Camera_pos", camera.getPos());
+
 		renderQuad();
 
 		
