@@ -35,7 +35,7 @@ public:
 
 	Shader* getShader();
 	void draw();
-
+	void draw(Shader* shader);
 private:
 
 	std::vector<Material*> _getMaterialsFromFile(const char* path, const char* objname);

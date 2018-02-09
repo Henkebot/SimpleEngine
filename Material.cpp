@@ -44,6 +44,7 @@ void Material::bind(Shader* shader)
 void Material::unbind()
 {
 	m_DiffuseMapTexture->unbind();
+	m_SpecularTexture->unbind();
 }
 
 void Material::setAmbientMap(const char * ambientMap)

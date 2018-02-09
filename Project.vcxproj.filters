@@ -78,6 +78,9 @@
     <ClCompile Include="TerrainTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DeferredLightning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -159,6 +162,9 @@
     <None Include="shaders\terrain\stTessEvaluation.glsl" />
     <None Include="shaders\terrain\stGeometry.glsl" />
     <None Include="shaders\terrain\stFragment.glsl" />
+    <None Include="shaders\objGeoPassFrag.glsl" />
+    <None Include="shaders\objLightPassVert.glsl" />
+    <None Include="shaders\objLightPassFrag.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="fragment3D.frag" />
