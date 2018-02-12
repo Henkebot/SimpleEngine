@@ -10,9 +10,6 @@ uniform vec2 BillboardSize;
 void main()
 {
 	vec3 particleCenter_worldSpace = BillboardPos;
-	vec3 vertexPosition_worldSpace = 
-			particleCenter_worldSpace 
-			+ CameraRightWorld * in_vert.x 
-			+ CameraUpWorld * in_vert.y;
+	vec3 vertexPosition_worldSpace = particleCenter_worldSpace + CameraRightWorld * in_vert.y + CameraUpWorld * in_vert.x;
 	gl_Position = ViewProj * vec4(vertexPosition_worldSpace, 1.0f);
 }

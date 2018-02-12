@@ -185,6 +185,15 @@ void Shader::setUniform1i(const GLchar * unifom, int value)
 	GLCall(glUniform1i(location, value));
 }
 
+void Shader::setUniform1ui(const GLchar * uniform, unsigned int value)
+{
+	bind();
+
+	GLint location;
+	GLCall(location = glGetUniformLocation(m_Program, uniform));
+	GLCall(glUniform1ui(location, value));
+}
+
 void Shader::bind()
 {
 	GLCall(glUseProgram(m_Program));

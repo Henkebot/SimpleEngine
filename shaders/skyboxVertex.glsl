@@ -7,6 +7,6 @@ out vec3 vs_TextureCoord;
 
 void main()
 {
-	gl_Position = Projection * View * World * in_vertex;
+	gl_Position = (Projection * View * World * in_vertex).xyww;
 	vs_TextureCoord = normalize(in_vertex.xyz) * -1;
 }

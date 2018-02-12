@@ -31,6 +31,7 @@ public:
 	void setUniform2f(const GLchar* uniform, glm::vec2 vector);
 	void setUniform1f(const GLchar* uniform, float value);
 	void setUniform1i(const GLchar* unifom, int value);
+	void setUniform1ui(const GLchar* uniform, unsigned int value);
 
 
 	void bind();
