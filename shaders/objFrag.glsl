@@ -45,8 +45,9 @@ void main()
 	vec3 finalSpecular = vec3(1) * spec;
 
 	float distance = length(fs_in.TangentFragPos - fs_in.TangentLightPos);
-	outColor = vec4(fs_in.TangentLightPos, 1);
-	outColor = vec4(MaterialAmbientColor + 
-					(diffuseFinal * LightColor * lightPower / (distance * distance)) + 
-					(finalSpecular * LightColor * lightPower / (distance * distance)),1.0);
+	vec3 Color = MaterialAmbientColor +
+		(diffuseFinal * LightColor * lightPower / (distance * distance)) +
+		(finalSpecular * LightColor * lightPower / (distance * distance));
+
+	outColor = vec4(Color,1.0);
 }

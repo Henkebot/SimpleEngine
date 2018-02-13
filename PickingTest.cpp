@@ -130,6 +130,7 @@ main
 			}
 		}
 		
+		
 	
 		glStencilMask(0x00);
 		box.render(camera);
@@ -157,7 +158,6 @@ main
 		floor.getShader()->setUniform3f("Camera_Pos", camera.getPos());
 		floor.getShader()->setUniform1f("lightPower", 40.0f);
 		floor.draw();
-
 		if (index != 0)
 		{
 
@@ -174,17 +174,24 @@ main
 			{
 				model = positions[index - 1];
 				currentModel = walls[index - 1];
+				simpleShader.setUniform1f("uniformNormals", 0);
+				model =  glm::scale(model, glm::vec3(scale, scale, scale));
 			}
+			else
+			{
+				simpleShader.setUniform1f("uniformNormals", 1);
+			}
+			glDisable(GL_DEPTH_TEST);
+			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
 			currentModel->draw();
 
-			glDisable(GL_DEPTH_TEST);
+			glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 			glStencilMask(0x00);
 
 			simpleShader.setUniformMat4f("view", camera.getViewMatrix());
 			simpleShader.setUniformMat4f("projection", projection);
-			model = glm::scale(model, glm::vec3(scale, scale, scale));
 			simpleShader.setUniformMat4f("model", model);
 
 			currentModel->draw(&simpleShader);
@@ -193,8 +200,9 @@ main
 			glEnable(GL_DEPTH_TEST);
 
 
-		}
 
+		}
+		
 		drawIndex = 1;
 		
 

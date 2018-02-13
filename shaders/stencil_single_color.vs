@@ -6,8 +6,11 @@ layout(location = 2) in vec3 normals;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform float uniformNormals;
 
 void main()
 {
-	gl_Position = projection * view * model * vec4(pos + (normals *0.02),1.0);
+	vec3 normal = normalize(normals);
+	vec3 finalPos = (uniformNormals > 0) ? (pos + (normal * 0.1)) : pos;
+	gl_Position = projection * view * model * vec4(finalPos,1.0);
 }
