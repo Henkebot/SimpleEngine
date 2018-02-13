@@ -15,9 +15,18 @@ main
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
 	static const GLfloat aspect = 1280.0f / 720.0f;
 	static const glm::mat4 projection = glm::perspective(70.0f, aspect, 0.01f, 200.0f);
+
+	Model nanosuit("res/Objs/nanosuit", "nanosuit.obj", 1);
+	glm::mat4 nanoPos = glm::scale(glm::translate(glm::vec3(0, 1, 0)), glm::vec3(0.2, 0.2, 0.2));
+
+	nanosuit.getShader()->setUniformMat4f("Projection", projection);
+	nanosuit.getShader()->setUniformMat4f("World", nanoPos);
 
 	Model floor("res/Objs/woodenfloor", "floor.obj", 1);
 	floor.getShader()->setUniformMat4f("Projection", projection);
@@ -80,19 +89,12 @@ main
 		if (GetAsyncKeyState(VK_SPACE))
 		{
 			window.restoreMouse();
-			
-			
-			checkMouse = true;
 		}
 		else
 		{
-			checkMouse = false;
 			camera.update(x, y);
-
 			window.hideAndGrabMouseMode();
 		}
-
-		
 
 		pt.enableWriting();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -109,23 +111,28 @@ main
 
 		}
 
+		pickingShader.setUniformMat4f("P", projection);
+		pickingShader.setUniformMat4f("V", camera.getViewMatrix());
+		pickingShader.setUniformMat4f("M", nanoPos);
+		pickingShader.setUniform1ui("drawIndex", drawIndex);
+		pickingShader.setUniform1ui("objectIndex", drawIndex++);
+		nanosuit.draw(&pickingShader);
+
 		pt.disableWriting();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		box.render(camera);
 		int index = 0;
 		if (GetAsyncKeyState(VK_SPACE))
 		{
 			PickingTexture::PixelInfo pixel = pt.readPixel((x), (window.getHeight() - y - 1));
 			if (pixel.objectID != 0)
 			{
-				std::cout << "MouseX: " << x << "MouseY:" << (window.getHeight() - y - 1) << std::endl;
-				std::cout << "HIT A WALL with index: " << pixel.objectID << std::endl;
 				index = pixel.objectID;
-
 			}
 		}
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilMask(0xFF);
+		
+	
+		glStencilMask(0x00);
+		box.render(camera);
 		for (int i = 0; i < 4; i++)
 		{
 			
@@ -138,38 +145,58 @@ main
 
 		}
 
-		if (index != 0)
-		{
-			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-			glStencilMask(0x00);
-			glDisable(GL_DEPTH_TEST);
-			float scale = 1.1;
-			glm::mat4 model = positions[index - 1];
+		nanosuit.getShader()->setUniformMat4f("View", camera.getViewMatrix());
+		nanosuit.getShader()->setUniform3f("Light_pos", light.getPosition());
+		nanosuit.getShader()->setUniform3f("Camera_Pos", camera.getPos());
+		nanosuit.getShader()->setUniform1f("lightPower", 40.0f);
+		nanosuit.getShader()->setUniformMat4f("World", nanoPos);
+		nanosuit.draw();
 
-
-			simpleShader.setUniformMat4f("view", camera.getViewMatrix());
-			simpleShader.setUniformMat4f("projection", projection);
-			model = positions[index - 1];
-			model = glm::scale(model, glm::vec3(scale, scale, scale));
-			simpleShader.setUniformMat4f("model", model);
-			walls[index - 1]->draw(&simpleShader);
-
-			
-			model = positions[index - 1];
-			walls[index - 1]->getShader()->setUniformMat4f("World", model);
-			walls[index - 1]->draw();
-
-			
-			glStencilMask(0xFF);
-			glEnable(GL_DEPTH_TEST);
-		}
-
-		drawIndex = 1;
 		floor.getShader()->setUniformMat4f("View", camera.getViewMatrix());
 		floor.getShader()->setUniform3f("Light_pos", light.getPosition());
 		floor.getShader()->setUniform3f("Camera_Pos", camera.getPos());
 		floor.getShader()->setUniform1f("lightPower", 40.0f);
 		floor.draw();
+
+		if (index != 0)
+		{
+
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);
+			glStencilMask(0xFF);
+
+			float scale = 1.05;
+
+			Model* currentModel = &nanosuit;
+
+			glm::mat4 model = nanoPos;
+
+			if (index != 5)
+			{
+				model = positions[index - 1];
+				currentModel = walls[index - 1];
+			}
+
+			currentModel->draw();
+
+			glDisable(GL_DEPTH_TEST);
+			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+			glStencilMask(0x00);
+
+			simpleShader.setUniformMat4f("view", camera.getViewMatrix());
+			simpleShader.setUniformMat4f("projection", projection);
+			model = glm::scale(model, glm::vec3(scale, scale, scale));
+			simpleShader.setUniformMat4f("model", model);
+
+			currentModel->draw(&simpleShader);
+
+			glStencilMask(0xFF);
+			glEnable(GL_DEPTH_TEST);
+
+
+		}
+
+		drawIndex = 1;
+		
 
 		//// mat4 Projection
 		glm::mat4 ViewMatrix = camera.getViewMatrix();
