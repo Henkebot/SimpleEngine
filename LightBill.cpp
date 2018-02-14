@@ -26,12 +26,17 @@ Shader * LightBill::getShader()
 	return m_pShader;
 }
 
+void LightBill::move(glm::vec3 move)
+{
+	m_Pos += move;
+}
+
 void LightBill::draw()
 {
 	m_Vao.bind();
 	m_pIndexBuffer->bind();
 	m_pShader->bind();
-
+	m_pShader->setUniform3f("BillboardPos", m_Pos);
 	GLCall(glDrawElements(GL_TRIANGLES, m_pIndexBuffer->getIndices(), GL_UNSIGNED_SHORT, 0));
 }
 

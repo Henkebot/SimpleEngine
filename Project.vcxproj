@@ -36,9 +36,14 @@
     <ClCompile Include="LightBill.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="PickingTest.cpp" />
+    <ClCompile Include="PickingTest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="PickingTexture.cpp" />
     <ClCompile Include="Render2D.cpp" />
+    <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="ShadowMappingTest.cpp" />
     <ClCompile Include="TerrainTest.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -72,6 +77,7 @@
     <ClInclude Include="OpenGLError.h" />
     <ClInclude Include="PickingTexture.h" />
     <ClInclude Include="Render2D.h" />
+    <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="TGALoader.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="LightBill.h" />
@@ -123,7 +129,7 @@
     <ProjectGuid>{57ABE39C-F70F-4969-A7B9-EB19A3335D84}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Project</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

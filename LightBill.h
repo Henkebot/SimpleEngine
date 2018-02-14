@@ -18,7 +18,7 @@ public:
 
 	glm::vec3 getPosition() const;
 	Shader* getShader();
-
+	void move(glm::vec3);
 	void draw();
 
 private:
