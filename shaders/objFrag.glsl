@@ -5,6 +5,7 @@ uniform sampler2D diffuseTexture;
 uniform sampler2D ambientTexture;
 uniform sampler2D specularTexture;
 uniform sampler2D bumpMap;
+uniform samplerCube depthMap;
 
 uniform vec3 specularColor;
 uniform vec3 diffuseColor;
@@ -22,6 +23,7 @@ in DATA
 
 } fs_in;
 
+
 void main()
 {
 	vec3 LightColor = vec3(1,1,1);
@@ -33,21 +35,21 @@ void main()
 	vec3 normal = texture(bumpMap, fs_in.uvs).rgb;
 	normal = normalize(normal * 2.0 - 1.0);
 	// Diffuse
-	vec3 lightDir = normalize(fs_in.TangentFragPos - fs_in.TangentLightPos);
-	float diff = clamp(dot(-lightDir,normal), 0, 1);
+	vec3 lightDir = normalize(fs_in.TangentLightPos - fs_in.TangentFragPos);
+	float diff = clamp(dot(lightDir,normal), 0, 1);
 	vec3 diffuseFinal = diff * MaterialDiffuseColor;
 	
 	// Specular
-	vec3 viewDir = normalize(fs_in.TangentFragPos - fs_in.TangentViewPos );
-	vec3 reflectDir = reflect(lightDir, normal);
-	vec3 halfwayDir = normalize(lightDir - viewDir);
-	float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+	vec3 viewDir = normalize(fs_in.TangentViewPos  - fs_in.TangentFragPos);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	float spec = pow(max(dot(normal, halfwayDir), 0.0), 16.0);
 	vec3 finalSpecular = vec3(1) * spec;
 
-	float distance = length(fs_in.TangentFragPos - fs_in.TangentLightPos);
-	vec3 Color = MaterialAmbientColor +
-		(diffuseFinal * LightColor * lightPower / (distance * distance)) +
-		(finalSpecular * LightColor * lightPower / (distance * distance));
+	float distanceSquare = length(fs_in.TangentFragPos - fs_in.TangentLightPos) * length(fs_in.TangentFragPos - fs_in.TangentLightPos);
+
+	vec3 Color = (MaterialAmbientColor  +
+		((diffuseFinal * LightColor * lightPower) / (distanceSquare)) +
+		((finalSpecular * LightColor * lightPower) / distanceSquare));
 
 	outColor = vec4(Color,1.0);
 }

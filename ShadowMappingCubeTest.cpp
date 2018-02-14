@@ -18,7 +18,7 @@ main
 	static const glm::mat4 projection = glm::perspective(70.0f, aspect, 0.01f, 200.0f);
 
 	Model floor("res/Objs/woodenfloor", "floor.obj", 1);
-	glm::mat4 floorPos = glm::rotate(3.141592f / 2.0f, glm::vec3(1, 0, 0)) * glm::scale(glm::vec3(20, 20, 20));
+	glm::mat4 floorPos = glm::rotate(3.141592f / 2.0f, glm::vec3(1, 0, 0)) * glm::scale(glm::vec3(200, 200, 200));
 
 
 	glm::mat4 positions[4];
@@ -82,17 +82,33 @@ main
 		double x, y;
 		window.getMousePosition(x, y);
 		camera.update(x, y);
-
+		static bool shift = false;
+		if (GetAsyncKeyState(VK_SHIFT))
+			shift = true;
+		else
+			shift = false;
 		if (GetAsyncKeyState(int('C')))
-		light.move(glm::vec3(0, 0, 1));
+		{
+			
+			light.move(glm::vec3(0, 0, shift ? 1 : -1));
+		}
 		else if (GetAsyncKeyState(int('V')))
-		light.move(glm::vec3(0, 0, -1));
+		{
+
+			light.move(glm::vec3(shift ? 1 : -1, 0,0));
+		}
+		else if (GetAsyncKeyState(int('X')))
+		{
+
+			light.move(glm::vec3(0, shift ? 1 : -1, 0));
+		}
 
 		// 0. Create depth cubemap transformation matrices
 		float near_plane = 1.0f;
 		float far_plane = 25.0f;
 		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
 		std::vector<glm::mat4> shadowTransforms;
+		// Projection * View, but in shadows
 		shadowTransforms.push_back(shadowProj * glm::lookAt(light.getPosition(), light.getPosition() + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 		shadowTransforms.push_back(shadowProj * glm::lookAt(light.getPosition(), light.getPosition() + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 		shadowTransforms.push_back(shadowProj * glm::lookAt(light.getPosition(), light.getPosition() + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
