@@ -93,6 +93,9 @@
     <ClCompile Include="ShadowMappingTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowMappingCubeTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">
@@ -187,6 +190,11 @@
     <None Include="shaders\picking.fs" />
     <None Include="shaders\stencil_single_color.vs" />
     <None Include="shaders\stencil_single_color.fs" />
+    <None Include="shaders\point_shadow_mapping.vs" />
+    <None Include="shaders\point_shadow_mapping.fs" />
+    <None Include="shaders\point_shadows_depth.vs" />
+    <None Include="shaders\point_shadows_depth.fs" />
+    <None Include="shaders\point_shadows_depth.gs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="fragment3D.frag" />

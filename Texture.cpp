@@ -25,6 +25,7 @@ void Texture::bind(Shader* shaderProgram, const int textureNr)
 
 void Texture::unbind()
 {
+	glActiveTexture(GL_TEXTURE0);
 	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 }
 

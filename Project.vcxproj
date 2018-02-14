@@ -43,7 +43,12 @@
     <ClCompile Include="PickingTexture.cpp" />
     <ClCompile Include="Render2D.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
-    <ClCompile Include="ShadowMappingTest.cpp" />
+    <ClCompile Include="ShadowMappingCubeTest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ShadowMappingTest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="TerrainTest.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -101,6 +106,11 @@
     <None Include="shaders\objLightPassVert.glsl" />
     <None Include="shaders\picking.fs" />
     <None Include="shaders\picking.vs" />
+    <None Include="shaders\point_shadows_depth.fs" />
+    <None Include="shaders\point_shadows_depth.gs" />
+    <None Include="shaders\point_shadows_depth.vs" />
+    <None Include="shaders\point_shadow_mapping.fs" />
+    <None Include="shaders\point_shadow_mapping.vs" />
     <None Include="shaders\skyboxFrag.glsl" />
     <None Include="shaders\skyboxVertex.glsl" />
     <None Include="shaders\stencil_single_color.fs" />
