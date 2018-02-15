@@ -120,7 +120,7 @@ main
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		
+		glCullFace(GL_FRONT);
 		for (unsigned int i = 0; i < 6; ++i)
 		{
 			std::string index = "shadowMatrices[";
@@ -130,37 +130,35 @@ main
 		}
 		simpleDepthShader.setUniform1f("far_plane", far_plane);
 		simpleDepthShader.setUniform3f("lightPos", light.getPosition());
-		simpleDepthShader.setUniform1i("reverse_normals", 0);
 		for (int i = 0; i < 4; i++)
 		{
 			simpleDepthShader.setUniformMat4f("model", positions[i]);
 			wall->draw(&simpleDepthShader);
 		}
-		simpleDepthShader.setUniformMat4f("model", floorPos);
-		floor.draw(&simpleDepthShader);
+		/*simpleDepthShader.setUniformMat4f("model", floorPos);
+		floor.draw(&simpleDepthShader);*/
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		
 
 		glViewport(0, 0, 1280, 720);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+		glCullFace(GL_BACK);
 		glm::mat4 view = camera.getViewMatrix();
 		shader.bind();
-		shader.setUniformMat4f("projection", projection);
-		shader.setUniformMat4f("view", view);
+		shader.setUniformMat4f("Projection", projection);
+		shader.setUniformMat4f("View", view);
 		// set lighting uniforms
-		shader.setUniform3f("lightPos", light.getPosition());
-		shader.setUniform3f("viewPos", camera.getPos());
-		shader.setUniform1i("shadows", 1); // enable/disable shadows by pressing 'SPACE'
+		shader.setUniform3f("Light_Pos", light.getPosition());
+		shader.setUniform3f("Camera_pos", camera.getPos());
 		shader.setUniform1f("far_plane", far_plane);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 		for (int i = 0; i < 4; i++)
 		{
-			shader.setUniformMat4f("model", positions[i]);
+			shader.setUniformMat4f("World", positions[i]);
 			wall->draw(&shader);
 		}
-		shader.setUniformMat4f("model", floorPos);
+		shader.setUniformMat4f("World", floorPos);
 		floor.draw(&shader);
 		
 		
