@@ -166,19 +166,7 @@ main
 
 		renderQuad();
 
-		
-
-		glm::mat4 ViewMatrix = camera.getViewMatrix();
-
-		glm::vec3 cameraRight_worldspace = glm::vec3(ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
-		glm::vec3 cameraUp_worldspace = glm::vec3(ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
-		//
-		light.getShader()->setUniform3f("CameraRightWorld", cameraRight_worldspace);
-		light.getShader()->setUniform3f("CameraUpWorld", cameraUp_worldspace);
-
-		glm::mat4 ViewProjMatrix = projection * ViewMatrix;
-		light.getShader()->setUniformMat4f("ViewProj", ViewProjMatrix);
-		light.draw();
+		light.draw(camera, projection);
 
 		window.update();
 	}

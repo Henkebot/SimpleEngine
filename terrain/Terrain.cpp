@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "../OpenGLError.h"
+int Terrain::VMB_TERRAIN_REC_CUTOFF = 20;
 Terrain::Terrain(const char * configFile, Camera* camera)
 	:m_pCamera(camera)
 {
@@ -66,7 +67,7 @@ bool Terrain::_checkDivide(TerrainNode * node)
 		pow(0.5*node->height, 2.0)
 	);
 
-	if (distance > 2.5 * distance2 || node->width < VMB_TERRAIN_REC_CUTOFF)
+	if (distance > 3* distance2 || node->width < VMB_TERRAIN_REC_CUTOFF)
 	{
 
 		return false;
@@ -199,7 +200,6 @@ void Terrain::_renderNode(TerrainNode * node)
 	m_pShader->setUniform3f("camera_pos", m_pCamera->getPos());
 
 	GLCall(glDrawElements(GL_PATCHES, 4, GL_UNSIGNED_SHORT, 0));
-
 }
 
 void Terrain::_calcTessScale(TerrainNode * node)
@@ -297,9 +297,9 @@ void Terrain::_initGraphics()
 	
 	float quadUVs[] =
 	{
-		0.0f, 3.0f,					// Tex coord (u,v)
-		3.0f, 3.0f,					// Tex coord (u,v)
-		3.0f, 0.0f,					// Tex coord (u,v)
+		0.0f, 1.0f,					// Tex coord (u,v)
+		1.0f, 1.0f,					// Tex coord (u,v)
+		1.0f, 0.0f,					// Tex coord (u,v)
 		0.0f, 0.0f,					// Tex coord (u,v)
 	};
 	GLushort quadPatchIndices[] = { 0, 1, 2, 3 };
@@ -309,22 +309,19 @@ void Terrain::_initGraphics()
 	m_IndexBuffer = new IndexBuffer(quadPatchIndices, sizeof(quadPatchIndices));
 
 	// TEXTURE SETUP
-	if (strlen(scene.heightMap))
-	{
-		_loadTextureMipmap(GL_TEXTURE0, 0, 5, scene.heightMap, "TexTerrainHeight");
-	}
-	_loadTextureMipmap(GL_TEXTURE1, 1, scene.texBase.mipLevels, scene.texBase.colorMap, "TexBase");
-	_loadTextureMipmap(GL_TEXTURE2, 2, scene.tex0.mipLevels, scene.tex0.colorMap, "Tex0");
-	_loadTextureMipmap(GL_TEXTURE3, 3, scene.tex1.mipLevels, scene.tex1.colorMap, "Tex1");
-	_loadTextureMipmap(GL_TEXTURE4, 4, scene.tex2.mipLevels, scene.tex2.colorMap, "Tex2");
-	_loadTextureMipmap(GL_TEXTURE5, 5, scene.tex3.mipLevels, scene.tex3.colorMap, "Tex3");
+	_loadTextureMipmap(GL_TEXTURE0, 0, 5, scene.heightMap, "TexTerrainHeight");
+	_loadTextureMipmap(GL_TEXTURE1, 1, 5, scene.normalMap, "NormalMap");
+	_loadTextureMipmap(GL_TEXTURE2, 2, 5, scene.blendMap, "BlendMap");
+	_loadTextureMipmap(GL_TEXTURE3, 3, scene.texBase.mipLevels, scene.texBase.colorMap, "TexBase");
+	_loadTextureMipmap(GL_TEXTURE4, 4, scene.texBase.mipLevels, scene.texBase.normalMap, "TexBaseNormal");
+	_loadTextureMipmap(GL_TEXTURE5, 5, scene.tex0.mipLevels, scene.tex0.colorMap, "Tex0");
+	_loadTextureMipmap(GL_TEXTURE6, 6, scene.tex1.mipLevels, scene.tex1.colorMap, "Tex1");
+	_loadTextureMipmap(GL_TEXTURE7, 7, scene.tex2.mipLevels, scene.tex2.colorMap, "Tex2");
 
 	m_pShader->setUniform1f("TerrainLength", scene.terrainLength);
 	m_pShader->setUniform1f("TerrainWidth", scene.terrainWidth);
 	m_pShader->setUniform3f("TerrainOrigin", glm::vec3(-scene.terrainWidth / 2.0f, 0.0, -scene.terrainLength / 2.0f));
 	m_pShader->setUniform1f("TerrainHeightOffset", scene.terrainHeight);
-	m_pShader->setUniform4f("SplatHeightSoft", glm::vec4(scene.tex0.softHeight, scene.tex1.softHeight, scene.tex2.softHeight, scene.tex3.softHeight));
-	m_pShader->setUniform4f("SplatHeightHard", glm::vec4(scene.tex0.hardHeight, scene.tex1.hardHeight, scene.tex2.hardHeight, scene.tex3.hardHeight));
 
 	GLCall(glPatchParameteri(GL_PATCH_VERTICES, 4));
 
@@ -346,32 +343,22 @@ void Terrain::_initScene()
 	scene.texBase.colorMap[0] = '\0';
 	scene.texBase.normalMap[0] = '\0';
 	scene.texBase.mipLevels = 3;
-	scene.texBase.softHeight = 0;
-	scene.texBase.hardHeight = 0;
 
 	scene.tex0.colorMap[0] = '\0';
 	scene.tex0.normalMap[0] = '\0';
 	scene.tex0.mipLevels = 3;
-	scene.tex0.softHeight = 0;
-	scene.tex0.hardHeight = 0;
 
 	scene.tex1.colorMap[0] = '\0';
 	scene.tex1.normalMap[0] = '\0';
 	scene.tex1.mipLevels = 3;
-	scene.tex1.softHeight = 0;
-	scene.tex1.hardHeight = 0;
 
 	scene.tex2.colorMap[0] = '\0';
 	scene.tex2.normalMap[0] = '\0';
 	scene.tex2.mipLevels = 3;
-	scene.tex2.softHeight = 0;
-	scene.tex2.hardHeight = 0;
 
 	scene.tex3.colorMap[0] = '\0';
 	scene.tex3.normalMap[0] = '\0';
 	scene.tex3.mipLevels = 3;
-	scene.tex3.softHeight = 0;
-	scene.tex3.hardHeight = 0;
 }
 
 void Terrain::_loadTextureMipmap(GLenum texture, int texNum, int mipLevels, char * file,/* program, */ const char * uniform)
@@ -447,6 +434,12 @@ void Terrain::_loadConfig(const char * configFile)
 			fscanf_s(file, "%s", &location, 50);
 			strcpy_s(scene.normalMap, 50 * sizeof(char), location);
 		}
+		else if (!strcmp(line, "BlendMap"))
+		{
+			char location[50];
+			fscanf_s(file, "%s", &location, 50);
+			strcpy_s(scene.blendMap, 50 * sizeof(char), location);
+		}
 
 		else if (!strcmp(line, "TexBase"))
 		{
@@ -465,18 +458,6 @@ void Terrain::_loadConfig(const char * configFile)
 			float value = 0.0f;
 			fscanf_s(file, "%f", &value);
 			scene.texBase.mipLevels = value;
-		}
-		else if (!strcmp(line, "TexBaseSoftHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.texBase.softHeight = value;
-		}
-		else if (!strcmp(line, "TexBaseHardHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.texBase.hardHeight = value;
 		}
 
 		else if (!strcmp(line, "Tex0"))
@@ -497,18 +478,6 @@ void Terrain::_loadConfig(const char * configFile)
 			fscanf_s(file, "%f", &value);
 			scene.tex0.mipLevels = value;
 		}
-		else if (!strcmp(line, "Tex0SoftHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.tex0.softHeight = value;
-		}
-		else if (!strcmp(line, "Tex0HardHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.tex0.hardHeight = value;
-		}
 
 		else if (!strcmp(line, "Tex1"))
 		{
@@ -527,18 +496,6 @@ void Terrain::_loadConfig(const char * configFile)
 			float value = 0.0f;
 			fscanf_s(file, "%f", &value);
 			scene.tex1.mipLevels = value;
-		}
-		else if (!strcmp(line, "Tex1SoftHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.tex1.softHeight = value;
-		}
-		else if (!strcmp(line, "Tex1HardHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.tex1.hardHeight = value;
 		}
 
 		else if (!strcmp(line, "Tex2"))
@@ -559,18 +516,6 @@ void Terrain::_loadConfig(const char * configFile)
 			fscanf_s(file, "%f", &value);
 			scene.tex2.mipLevels = value;
 		}
-		else if (!strcmp(line, "Tex2SoftHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.tex2.softHeight = value;
-		}
-		else if (!strcmp(line, "Tex2HardHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.tex2.hardHeight = value;
-		}
 
 		else if (!strcmp(line, "Tex3"))
 		{
@@ -590,18 +535,6 @@ void Terrain::_loadConfig(const char * configFile)
 			fscanf_s(file, "%f", &value);
 			scene.tex3.mipLevels = value;
 		}
-		else if (!strcmp(line, "Tex3SoftHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.tex3.softHeight = value;
-		}
-		else if (!strcmp(line, "Tex3HardHeight"))
-		{
-			float value = 0.0f;
-			fscanf_s(file, "%f", &value);
-			scene.tex3.hardHeight = value;
-		}
 		else
 			std::cout << "Error reading " << configFile << std::endl;
 
@@ -610,9 +543,9 @@ void Terrain::_loadConfig(const char * configFile)
 	
 	fclose(file);
 
-	if (scene.terrainHeight == 0.0f)
-		scene.terrainHeight = 1.0f;
-	if (scene.terrainWidth == 0.0f)
-		scene.terrainWidth = 1.0f;
+	if (scene.terrainHeight == 0.0)
+		scene.terrainHeight = 1.0;
+	if (scene.terrainWidth == 0.0)
+		scene.terrainWidth = 1.0;
 
 }

@@ -31,11 +31,23 @@ void LightBill::move(glm::vec3 move)
 	m_Pos += move;
 }
 
-void LightBill::draw()
+void LightBill::draw(Camera camera, glm::mat4 projection)
+
 {
+
+	m_pShader->bind();
+	glm::mat4 ViewMatrix = camera.getViewMatrix();
+
+	glm::vec3 cameraRight_worldspace = glm::vec3(ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);
+	glm::vec3 cameraUp_worldspace = glm::vec3(ViewMatrix[0][1], ViewMatrix[1][1], ViewMatrix[2][1]);
+	//
+	m_pShader->setUniform3f("CameraRightWorld", cameraRight_worldspace);
+	m_pShader->setUniform3f("CameraUpWorld", cameraUp_worldspace);
+
+	glm::mat4 ViewProjMatrix = projection * ViewMatrix;
+	m_pShader->setUniformMat4f("ViewProj", ViewProjMatrix);
 	m_Vao.bind();
 	m_pIndexBuffer->bind();
-	m_pShader->bind();
 	m_pShader->setUniform3f("BillboardPos", m_Pos);
 	GLCall(glDrawElements(GL_TRIANGLES, m_pIndexBuffer->getIndices(), GL_UNSIGNED_SHORT, 0));
 }

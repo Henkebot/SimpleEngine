@@ -6,10 +6,11 @@
 #include "../VertexArray.h"
 #include "../IndexBuffer.h"
 #define MAX_TERRAIN_NODES 1000
-#define VMB_TERRAIN_REC_CUTOFF 3
+
 class Terrain
 {
 private:
+	
 	struct TerrainNode
 	{
 		glm::vec3 origin;
@@ -43,14 +44,13 @@ private:
 		char colorMap[50];
 		char normalMap[50];
 		int mipLevels;
-		float softHeight;
-		float hardHeight;
 
 	};
 	struct Scene
 	{
 		char heightMap[50];
 		char normalMap[50];
+		char blendMap[50];
 		
 		TerrainTexture texBase; // Base Texture
 		TerrainTexture tex0; 
@@ -70,9 +70,13 @@ private:
 	IndexBuffer* m_IndexBuffer;
 	
 public:
+	static int VMB_TERRAIN_REC_CUTOFF;
+
 	Terrain(const char* configFile, Camera* camera);
 	void update();
 	void render();
+
+	inline Shader* getShader() { return m_pShader; }
 private:
 
 	void _createTree(float x, float y, float z, float width, float height);

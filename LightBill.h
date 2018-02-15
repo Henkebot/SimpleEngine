@@ -4,6 +4,7 @@
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "Camera.h"
 
 class LightBill
 {
@@ -19,7 +20,7 @@ public:
 	glm::vec3 getPosition() const;
 	Shader* getShader();
 	void move(glm::vec3);
-	void draw();
+	void draw(Camera camera, glm::mat4 projection);
 
 private:
 	void _init();

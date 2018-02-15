@@ -9,7 +9,6 @@ uniform	mat4 mvMatrix;
 uniform	mat4 mvpMatrix;
 uniform	mat3 nMatrix;
 
-uniform vec2 Viewport;
 uniform sampler2D TexTerrainHeight;
 uniform float TerrainHeightOffset;
 
