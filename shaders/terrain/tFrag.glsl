@@ -26,6 +26,10 @@ noperspective in vec4 gs_splatMap;
 noperspective in vec3 gs_edgeDist;
 in vec2 gs_terrainTexCoord;
 in vec2 gs_patchTexCoord;
+in vec3 gs_tangent;
+in vec3 gs_bitangent;
+in vec3 gs_normal;
+
 
 //
 // Ouputs
@@ -34,8 +38,9 @@ layout(location = 0, index = 0) out vec4 fragColor;
 
 void main(void)
 {
-	//vec4 color = vec4(mix(0.0, 1.0, tileScale / 1000.0), mix(1.0, 0.0, tileScale / 1000.0), 0.0, 1.0);
 	vec3 color = texture(TexBase, gs_patchTexCoord).rgb;
+
+
 	
 	vec3 tex0, tex1, tex2, tex3;
 	if (gs_splatMap[0] > 0)
@@ -67,5 +72,5 @@ void main(void)
 	float mixVal = smoothstep(LineWidth - 1, LineWidth + 1, d);
 
 	
-		fragColor = vec4(color,1);
+	fragColor = vec4(gs_bitangent,1);
 }

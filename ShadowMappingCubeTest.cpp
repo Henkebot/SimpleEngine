@@ -49,7 +49,7 @@ main
 
 	Shader shader(shadowShaders);
 	
-	
+	Skybox box("res/skyboxes/Skybox2/skybox", GL_TEXTURE0);
 	Shader simpleDepthShader(lightShadowShaders);
 	
 
@@ -82,6 +82,7 @@ main
 		double x, y;
 		window.getMousePosition(x, y);
 		camera.update(x, y);
+		
 		static bool shift = false;
 		if (GetAsyncKeyState(VK_SHIFT))
 			shift = true;
@@ -120,7 +121,7 @@ main
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		glCullFace(GL_FRONT);
+		
 		for (unsigned int i = 0; i < 6; ++i)
 		{
 			std::string index = "shadowMatrices[";
@@ -135,14 +136,15 @@ main
 			simpleDepthShader.setUniformMat4f("model", positions[i]);
 			wall->draw(&simpleDepthShader);
 		}
-		/*simpleDepthShader.setUniformMat4f("model", floorPos);
-		floor.draw(&simpleDepthShader);*/
+		simpleDepthShader.setUniformMat4f("model", floorPos);
+		floor.draw(&simpleDepthShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		
 
 		glViewport(0, 0, 1280, 720);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glCullFace(GL_BACK);
+
+		box.render(camera);
 		glm::mat4 view = camera.getViewMatrix();
 		shader.bind();
 		shader.setUniformMat4f("Projection", projection);
@@ -161,8 +163,7 @@ main
 		shader.setUniformMat4f("World", floorPos);
 		floor.draw(&shader);
 		
-		
-
+	
 		glm::mat4 ViewMatrix = camera.getViewMatrix();
 
 		glm::vec3 cameraRight_worldspace = glm::vec3(ViewMatrix[0][0], ViewMatrix[1][0], ViewMatrix[2][0]);

@@ -297,9 +297,9 @@ void Terrain::_initGraphics()
 	
 	float quadUVs[] =
 	{
-		0.0f, 1.0f,					// Tex coord (u,v)
-		1.0f, 1.0f,					// Tex coord (u,v)
-		1.0f, 0.0f,					// Tex coord (u,v)
+		0.0f, 3.0f,					// Tex coord (u,v)
+		3.0f, 3.0f,					// Tex coord (u,v)
+		3.0f, 0.0f,					// Tex coord (u,v)
 		0.0f, 0.0f,					// Tex coord (u,v)
 	};
 	GLushort quadPatchIndices[] = { 0, 1, 2, 3 };

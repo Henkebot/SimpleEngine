@@ -27,11 +27,14 @@ void Skybox::render(const Camera & camera)
 	m_pShader->bind();
 	m_Vao.bind();
 	m_pIndexBuffer->bind();
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_Texture);
+	glActiveTexture(GL_TEXTURE0);
 	m_pShader->setUniformMat4f("View", camera.getViewMatrix());
 	m_pShader->setUniformMat4f("World", glm::translate(camera.getPos()));
 
 	glDrawElements(GL_TRIANGLES, m_pIndexBuffer->getIndices(), GL_UNSIGNED_SHORT, 0);
-
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_DEPTH_TEST);
 	
 }

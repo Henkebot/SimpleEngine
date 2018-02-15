@@ -6,7 +6,7 @@
 #include "../VertexArray.h"
 #include "../IndexBuffer.h"
 #define MAX_TERRAIN_NODES 1000
-#define VMB_TERRAIN_REC_CUTOFF 100
+#define VMB_TERRAIN_REC_CUTOFF 3
 class Terrain
 {
 private:

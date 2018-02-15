@@ -63,7 +63,7 @@ float ShadowCalculation(vec3 fragPos)
 
 void main()
 {           
-	vec3 LightColor = vec3(1,1,1);
+	vec3 LightColor = vec3(1,0,0);
 	float lightPower = 40;
 
     vec3 MaterialDiffuseColor = texture(diffuseTexture, fs_in.TexCoords).rgb;
