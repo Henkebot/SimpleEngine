@@ -38,7 +38,7 @@ void Terrain::_createTree(float x, float y, float z, float width, float height)
 	m_pTerrainTree->tScaleNegZ = 1.0;
 	m_pTerrainTree->tScalePosX = 1.0;
 	m_pTerrainTree->tScalePosZ = 1.0;
-	m_pTerrainTree->parent = NULL;
+	m_pTerrainTree->parent = m_pTerrainTree;
 	m_pTerrainTree->north = NULL;
 	m_pTerrainTree->south = NULL;
 	m_pTerrainTree->west = NULL;
@@ -55,6 +55,11 @@ void Terrain::_clearTree()
 }
 bool Terrain::_checkDivide(TerrainNode * node)
 {
+	if (!node) return false;
+	
+	
+	
+
 	float distance = abs(
 		sqrt(
 			pow((m_pCamera->getPos().x) - node->origin.x, 2.0) +
@@ -67,22 +72,70 @@ bool Terrain::_checkDivide(TerrainNode * node)
 		pow(0.5*node->height, 2.0)
 	);
 
-	if (distance > 3* distance2 || node->width < VMB_TERRAIN_REC_CUTOFF)
+	if (distance > 2.* distance2 || node->width < VMB_TERRAIN_REC_CUTOFF)
 	{
 
 		return false;
 	}
 	return true;
 }
+
 GLboolean Terrain::_divideNode(TerrainNode * node)
 {
 	float newWidth = 0.5 * node->width;
 	float newHeight = 0.5 * node->height;
 
-	node->child1 = _createNode(node, 1, glm::vec3(node->origin.x - 0.5 * newWidth, node->origin.y, node->origin.z - 0.5 * newHeight), newWidth, newHeight);
-	node->child2 = _createNode(node, 2, glm::vec3(node->origin.x + 0.5 * newWidth, node->origin.y, node->origin.z - 0.5 * newHeight), newWidth, newHeight);
-	node->child3 = _createNode(node, 3, glm::vec3(node->origin.x + 0.5 * newWidth, node->origin.y, node->origin.z + 0.5 * newHeight), newWidth, newHeight);
-	node->child4 = _createNode(node, 4, glm::vec3(node->origin.x - 0.5 * newWidth, node->origin.y, node->origin.z + 0.5 * newHeight), newWidth, newHeight);
+	glm::vec3 position = glm::vec3(m_pCamera->getPos().x,0, m_pCamera->getPos().z);
+	glm::vec3 direction = glm::vec3(m_pCamera->getTarget().x, 0, m_pCamera->getTarget().z);
+
+	bool c1 = true;
+	bool c2 = true;
+	bool c3 = true;
+	bool c4 = true;
+
+	if (node->origin.x < position.x && node->origin.z > position.z)
+	{
+		if (direction.x > 0 && direction.z < 0) 
+		{
+			c4 = false;
+		}	
+	}
+	else if (node->origin.x > position.x && node->origin.z > position.z)
+	{
+		
+		if (direction.x < 0 && direction.z < 0)
+		{
+			
+			c3 = false;
+		}
+	}
+	else if (node->origin.x > position.x && node->origin.z < position.z)
+	{
+
+		if (direction.x < 0 && direction.z > 0)
+		{
+		
+			c2 = false;
+		}
+	}
+	else if (node->origin.x < position.x && node->origin.z < position.z)
+	{
+
+		if (direction.x > 0 && direction.z > 0)
+		{
+			
+			c1 = false;
+		}
+	}
+	
+	
+
+	
+
+	if(c1)node->child1 = _createNode(node, 1, glm::vec3(node->origin.x - 0.5 * newWidth, node->origin.y, node->origin.z - 0.5 * newHeight), newWidth, newHeight);
+	if(c2)node->child2 = _createNode(node, 2, glm::vec3(node->origin.x + 0.5 * newWidth, node->origin.y, node->origin.z - 0.5 * newHeight), newWidth, newHeight);
+	if(c3)node->child3 = _createNode(node, 3, glm::vec3(node->origin.x + 0.5 * newWidth, node->origin.y, node->origin.z + 0.5 * newHeight), newWidth, newHeight);
+	if(c4)node->child4 = _createNode(node, 4, glm::vec3(node->origin.x - 0.5 * newWidth, node->origin.y, node->origin.z + 0.5 * newHeight), newWidth, newHeight);
 
 	switch (node->type)
 	{
@@ -158,13 +211,13 @@ void Terrain::_renderRecursive(TerrainNode * node)
 		return;
 	}
 
-	//if (node->child1)
+	if (node->child1)
 		_renderRecursive(node->child1);
-	//if (node->child2)
+	if (node->child2)
 		_renderRecursive(node->child2);
-	//if (node->child3)
+	if (node->child3)
 		_renderRecursive(node->child3);
-	//if (node->child4)
+	if (node->child4)
 		_renderRecursive(node->child4);
 
 

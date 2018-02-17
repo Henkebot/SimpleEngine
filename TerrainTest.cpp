@@ -3,9 +3,10 @@
 #include "window.h"
 #include "Model.h"
 #include "LightBill.h"
+
 main
 {
-	Window window("TerrainTest", 1280, 720);
+	Window window("Gustav och Oskar och Johanna", 1280, 720);
 	window.hideAndGrabMouseMode();
 
 	static const GLfloat aspect = 1280.0f / 720.0f;
@@ -14,31 +15,27 @@ main
 	//----Skybox
 	Skybox box("res/skyboxes/Skybox2/skybox", GL_TEXTURE7);
 	LightBill light(0, 300, 0);
+	LightBill light2(512, 2, -512);
 
 	
 	Terrain terrain("res/terrains/terrain2/terrainSettings.txt", &camera);
+
+	Camera* currentCamera = &camera;
 	while (window.closed())
 	{
 		window.clear();
 		
-		if(GetAsyncKeyState(VK_UP))
-		{
-			std::cout << Terrain::VMB_TERRAIN_REC_CUTOFF++ << std::endl;
-		}
-		else if (GetAsyncKeyState(VK_DOWN))
-		{
-			Terrain::VMB_TERRAIN_REC_CUTOFF = max(0, --Terrain::VMB_TERRAIN_REC_CUTOFF);
-			std::cout << Terrain::VMB_TERRAIN_REC_CUTOFF << std::endl;
-		}
-		box.render(camera);
+		box.render(*currentCamera);
 		double x, y;
 		window.getMousePosition(x, y);
 
-		camera.update(x, y);
-		terrain.getShader()->setUniform3f("Light_Pos", light.getPosition());
-		terrain.getShader()->setUniform3f("Camera_Pos", camera.getPos());
+		currentCamera->update(x, y);
 
-		light.draw(camera, projection);
+		terrain.getShader()->setUniform3f("Light_Pos", light.getPosition());
+		terrain.getShader()->setUniform3f("Camera_Pos", currentCamera->getPos());
+
+		light.draw(*currentCamera, projection);
+		light2.draw(*currentCamera, projection);
 		terrain.update();
 		terrain.render();
 
