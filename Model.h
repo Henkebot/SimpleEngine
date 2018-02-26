@@ -66,10 +66,6 @@ private:
 		std::vector<glm::vec3> & bitangents
 	);
 
-	bool _getSimilarVertexIndex_fast(
-		PackedVertex & packed, std::map<PackedVertex, unsigned short>& vertexToOutIndex, unsigned short & result
-	);
-
 	void _indexVBO(std::vector<glm::vec3>& in_vertics,
 		std::vector<glm::vec2>& in_uvs,
 		std::vector<glm::vec3>& in_normals,

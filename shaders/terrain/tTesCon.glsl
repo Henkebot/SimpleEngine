@@ -48,11 +48,11 @@ float dlodCameraDistance(vec4 p0, vec4 p1, vec2 t0, vec2 t1)
 	vec4 view0 = mvMatrix * p0;
 	vec4 view1 = mvMatrix * p1;
 
-	float MinDepth = 10.0;
-	float MaxDepth = 100000.0;
+	float MinDepth = 0.0;
+	float MaxDepth = 1024.0;
 
-	float d0 = clamp((abs(p0.z) - MinDepth) / (MaxDepth - MinDepth), 0.0, 1.0);
-	float d1 = clamp((abs(p1.z) - MinDepth) / (MaxDepth - MinDepth), 0.0, 1.0);
+	float d0 = clamp((abs(view0.z) - MinDepth) / (MaxDepth - MinDepth), 0.0, 1.0);
+	float d1 = clamp((abs(view1.z) - MinDepth) / (MaxDepth - MinDepth), 0.0, 1.0);
 
 	float t = mix(64, 2, (d0 + d1) * 0.5);
 	
@@ -89,6 +89,7 @@ void main(void)
 	gl_TessLevelOuter[2] = dlodCameraDistance(gl_in[1].gl_Position, gl_in[2].gl_Position, tcs_terrainTexCoord[1], tcs_terrainTexCoord[2]);
 	gl_TessLevelOuter[3] = dlodCameraDistance(gl_in[2].gl_Position, gl_in[3].gl_Position, tcs_terrainTexCoord[2], tcs_terrainTexCoord[3]);
 
+	// To match the patches with eachother
 	if (tscale_negx == 2.0)
 		gl_TessLevelOuter[0] = max(2.0, gl_TessLevelOuter[0] * 0.5);
 	if (tscale_negz == 2.0)
@@ -98,7 +99,7 @@ void main(void)
 	if (tscale_posz == 2.0)
 		gl_TessLevelOuter[3] = max(2.0, gl_TessLevelOuter[3] * 0.5);
 
-	// Inner tessellation level
+	// Inner tessellation level is simply an average of the outer
 	gl_TessLevelInner[0] = 0.5 * (gl_TessLevelOuter[0] + gl_TessLevelOuter[3]);
 	gl_TessLevelInner[1] = 0.5 * (gl_TessLevelOuter[2] + gl_TessLevelOuter[1]);
 

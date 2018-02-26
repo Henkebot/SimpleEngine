@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "../OpenGLError.h"
-int Terrain::VMB_TERRAIN_REC_CUTOFF = 20;
+int Terrain::VMB_TERRAIN_REC_CUTOFF = 100;
 Terrain::Terrain(const char * configFile, Camera* camera)
 	:m_pCamera(camera)
 {
@@ -13,6 +13,12 @@ Terrain::Terrain(const char * configFile, Camera* camera)
 	_initShaders();
 	_initGraphics();
 
+}
+Terrain::~Terrain()
+{
+	delete[] m_pTerrainTree;
+	delete m_pShader;
+	delete m_IndexBuffer;
 }
 void Terrain::update()
 {
@@ -49,16 +55,16 @@ void Terrain::_createTree(float x, float y, float z, float width, float height)
 }
 void Terrain::_clearTree()
 {
+	
 	m_pTerrainTail = m_pTerrainTree;
+
 	memset(m_pTerrainTree, 0, MAX_TERRAIN_NODES * sizeof(TerrainNode));
 	m_NumTerrainNodes = 0;
 }
 bool Terrain::_checkDivide(TerrainNode * node)
 {
 	if (!node) return false;
-	
-	
-	
+
 
 	float distance = abs(
 		sqrt(
@@ -72,12 +78,8 @@ bool Terrain::_checkDivide(TerrainNode * node)
 		pow(0.5*node->height, 2.0)
 	);
 
-	if (distance > 2.* distance2 || node->width < VMB_TERRAIN_REC_CUTOFF)
-	{
-
-		return false;
-	}
-	return true;
+	return !(distance > 2.5* distance2 || node->width < VMB_TERRAIN_REC_CUTOFF);
+	
 }
 
 GLboolean Terrain::_divideNode(TerrainNode * node)
@@ -86,12 +88,21 @@ GLboolean Terrain::_divideNode(TerrainNode * node)
 	float newHeight = 0.5 * node->height;
 
 	glm::vec3 position = glm::vec3(m_pCamera->getPos().x,0, m_pCamera->getPos().z);
-	glm::vec3 direction = glm::vec3(m_pCamera->getTarget().x, 0, m_pCamera->getTarget().z);
+	glm::vec3 direction = m_pCamera->getTarget();
+
+	glm::vec3 childPos[4] =
+	{
+		glm::vec3(node->origin.x - 0.5 * newWidth, node->origin.y, node->origin.z - 0.5 * newHeight),
+		glm::vec3(node->origin.x + 0.5 * newWidth, node->origin.y, node->origin.z - 0.5 * newHeight),
+		glm::vec3(node->origin.x + 0.5 * newWidth, node->origin.y, node->origin.z + 0.5 * newHeight),
+		glm::vec3(node->origin.x - 0.5 * newWidth, node->origin.y, node->origin.z + 0.5 * newHeight)
+	};
 
 	bool c1 = true;
 	bool c2 = true;
 	bool c3 = true;
 	bool c4 = true;
+
 
 	if (node->origin.x < position.x && node->origin.z > position.z)
 	{
@@ -132,10 +143,10 @@ GLboolean Terrain::_divideNode(TerrainNode * node)
 
 	
 
-	if(c1)node->child1 = _createNode(node, 1, glm::vec3(node->origin.x - 0.5 * newWidth, node->origin.y, node->origin.z - 0.5 * newHeight), newWidth, newHeight);
-	if(c2)node->child2 = _createNode(node, 2, glm::vec3(node->origin.x + 0.5 * newWidth, node->origin.y, node->origin.z - 0.5 * newHeight), newWidth, newHeight);
-	if(c3)node->child3 = _createNode(node, 3, glm::vec3(node->origin.x + 0.5 * newWidth, node->origin.y, node->origin.z + 0.5 * newHeight), newWidth, newHeight);
-	if(c4)node->child4 = _createNode(node, 4, glm::vec3(node->origin.x - 0.5 * newWidth, node->origin.y, node->origin.z + 0.5 * newHeight), newWidth, newHeight);
+	if(c1)node->child1 = _createNode(node, 1, childPos[0], newWidth, newHeight);
+	if(c2)node->child2 = _createNode(node, 2, childPos[1], newWidth, newHeight);
+	if(c3)node->child3 = _createNode(node, 3, childPos[2], newWidth, newHeight);
+	if(c4)node->child4 = _createNode(node, 4, childPos[3], newWidth, newHeight);
 
 	switch (node->type)
 	{
@@ -261,21 +272,37 @@ void Terrain::_calcTessScale(TerrainNode * node)
 	
 	// Positive Z(north)
 	t = find(m_pTerrainTree, node->origin.x, node->origin.z + 1 + node->width / 2.0);
+	//if (node->child1 == NULL && node->child2 == NULL && node->child3 == NULL && node->child4 == NULL)
+	//	t = node;
+	//else
+	//	t = node->north;
 	if (t->width > node->width)
 		node->tScalePosZ = 2.0;
 	
 	// Positive X(east)
 	t = find(m_pTerrainTree, node->origin.x + 1 + node->width / 2.0, node->origin.z);
+	//if (node->child1 == NULL && node->child2 == NULL && node->child3 == NULL && node->child4 == NULL)
+	//	t = node;
+	//else
+	//	t = node->east;
 	if (t->width > node->width)
 		node->tScalePosX = 2.0;
 
 	// Negative Z(south)
 	t = find(m_pTerrainTree, node->origin.x, node->origin.z - 1 - node->width / 2.0);
+	//if (node->child1 == NULL && node->child2 == NULL && node->child3 == NULL && node->child4 == NULL)
+	//	t = node;
+	//else
+	//	t = node->south;
 	if (t->width > node->width)
 		node->tScaleNegZ = 2.0;
 
 	// Negative X(south)
 	t = find(m_pTerrainTree, node->origin.x - 1 - node->width / 2.0, node->origin.z);
+	//if (node->child1 == NULL && node->child2 == NULL && node->child3 == NULL && node->child4 == NULL)
+	//	t = node;
+	//else
+	//	t = node->west;
 	if (t->width > node->width)
 		node->tScaleNegX = 2.0;
 }
@@ -381,7 +408,7 @@ void Terrain::_initGraphics()
 }
 void Terrain::_initTerrain()
 {
-	m_pTerrainTree = (TerrainNode*)malloc(MAX_TERRAIN_NODES * sizeof(TerrainNode));
+	m_pTerrainTree = new TerrainNode[MAX_TERRAIN_NODES];// (TerrainNode*)malloc(MAX_TERRAIN_NODES * sizeof(TerrainNode));
 	_clearTree();
 }
 

@@ -12,9 +12,6 @@ uniform	mat3 nMatrix;
 uniform sampler2D TexTerrainHeight;
 uniform float TerrainHeightOffset;
 
-//
-// Inputs
-//
 layout(quads, fractional_even_spacing) in;
 
 patch in float gl_TessLevelOuter[4];

@@ -6,6 +6,7 @@
 
 main
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	Window window("Gustav och Oskar och Johanna", 1280, 720);
 	window.hideAndGrabMouseMode();
 
@@ -36,7 +37,8 @@ main
 
 		light.draw(*currentCamera, projection);
 		light2.draw(*currentCamera, projection);
-		terrain.update();
+		if(GetAsyncKeyState(int('C')))
+			terrain.update();
 		terrain.render();
 
 		window.update();

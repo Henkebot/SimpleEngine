@@ -9,7 +9,7 @@ main
 {
 	Window window("PickingTest", 1280, 720);
 	Camera camera(window.getWidth(), window.getHeight(), glm::vec3(-0.5, -0.2, -0.9), glm::vec3(12, 7, 18));
-	Skybox box("res/skyboxes/Skybox2/skybox", GL_TEXTURE7);
+	Skybox box("res/skyboxes/Skybox2/skybox", GL_TEXTURE8);
 
 
 	glEnable(GL_DEPTH_TEST);
@@ -145,7 +145,6 @@ main
 			walls[i]->getShader()->setUniform3f("Light_pos", light.getPosition());
 			walls[i]->getShader()->setUniform3f("Camera_Pos", camera.getPos());
 			walls[i]->getShader()->setUniform1f("lightPower", 40.0f);
-			walls[i]->getShader()->setUniformMat4f("World", positions[i]);
 			walls[i]->draw();
 
 		}
@@ -153,8 +152,7 @@ main
 		nanosuit.getShader()->setUniformMat4f("View", camera.getViewMatrix());
 		nanosuit.getShader()->setUniform3f("Light_pos", light.getPosition());
 		nanosuit.getShader()->setUniform3f("Camera_Pos", camera.getPos());
-		nanosuit.getShader()->setUniform1f("lightPower", 40.0f);
-		nanosuit.getShader()->setUniformMat4f("World", nanoPos);
+		nanosuit.getShader()->setUniform1f("lightPower", 20.0f);
 		nanosuit.draw();
 
 		floor.getShader()->setUniformMat4f("View", camera.getViewMatrix());
@@ -162,6 +160,7 @@ main
 		floor.getShader()->setUniform3f("Camera_Pos", camera.getPos());
 		floor.getShader()->setUniform1f("lightPower", 40.0f);
 		floor.draw();
+
 		if (index != 0)
 		{
 
@@ -209,7 +208,6 @@ main
 		glStencilMask(0xFF);
 		drawIndex = 1;
 		
-
 		//// mat4 Projection
 		
 		window.update();

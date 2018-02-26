@@ -28,10 +28,10 @@ void main()
 {
 	vec3 LightColor = vec3(1,1,1);
 
-	vec3 MaterialDiffuseColor = texture(diffuseTexture, fs_in.uvs).rgb * diffuseColor;
+	vec3 MaterialDiffuseColor = texture(diffuseTexture, fs_in.uvs).rgb;
 	vec3 MaterialAmbientColor = texture(ambientTexture, fs_in.uvs).rgb;
 	vec3 MaterialSpecularColor = texture(specularTexture, fs_in.uvs).rgb;
-
+	
 	vec3 normal = texture(bumpMap, fs_in.uvs).rgb;
 	normal = normalize(normal * 2.0 - 1.0);
 	// Diffuse

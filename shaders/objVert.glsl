@@ -25,7 +25,7 @@ void main()
 {
 	vs_out.uvs = in_uvs;
 	vs_out.pos = (World * vec4(in_pos,1.0f)).xyz;
-	vs_out.normals = in_normals;
+	vs_out.normals =(in_normals).xyz;
 	
 	mat3 normalMatrix = transpose(inverse(mat3(World)));
 	vec3 T = normalize(normalMatrix * in_tangents);

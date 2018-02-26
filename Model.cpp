@@ -668,17 +668,6 @@ void Model::computeTangentBasis(const std::vector<glm::vec3>& vertices, const st
 	}
 }
 
-bool Model::_getSimilarVertexIndex_fast(PackedVertex & packed, std::map<PackedVertex, unsigned short>& vertexToOutIndex, unsigned short & result)
-{
-	std::map<PackedVertex, unsigned short>::iterator it = vertexToOutIndex.find(packed);
-	
-	if (it == vertexToOutIndex.end())
-		return false;
-	
-	result = it->second;
-	return true;
-}
-
 void Model::_indexVBO(std::vector<glm::vec3>& in_vertics,
 	std::vector<glm::vec2>& in_uvs,
 	std::vector<glm::vec3>& in_normals,
@@ -692,22 +681,21 @@ void Model::_indexVBO(std::vector<glm::vec3>& in_vertics,
 	std::vector<glm::vec3>& out_tangents,
 	std::vector<glm::vec3>& out_bitangents)
 {
-
 	std::map<Model::PackedVertex, unsigned short> VertexToOutIndex;
 	
 	for (unsigned int i = 0; i < in_vertics.size(); i++)
 	{
 		Model::PackedVertex packed = { in_vertics[i],in_uvs[i],in_normals[i] };
-		
-		unsigned short index;
-		bool found = _getSimilarVertexIndex_fast(packed, VertexToOutIndex, index);
 
-		if (found)
+		std::map<PackedVertex, unsigned short>::iterator it = VertexToOutIndex.find(packed);
+
+		if (it != VertexToOutIndex.end())
 		{
+			unsigned short index = it->second;
 			out_indices.push_back(index);
 
-			out_tangents[index] += in_tangents[i];
-			out_bitangents[index] += in_bitangents[i];
+			out_tangents[index] = in_tangents[i];
+			out_bitangents[index] = in_bitangents[i];
 		}
 		else
 		{

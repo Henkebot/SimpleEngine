@@ -73,6 +73,7 @@ public:
 	static int VMB_TERRAIN_REC_CUTOFF;
 
 	Terrain(const char* configFile, Camera* camera);
+	virtual ~Terrain();
 	void update();
 	void render();
 
