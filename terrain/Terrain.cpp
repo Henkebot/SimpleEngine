@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "../OpenGLError.h"
-int Terrain::VMB_TERRAIN_REC_CUTOFF = 100;
+int Terrain::VMB_TERRAIN_REC_CUTOFF = 20;
 Terrain::Terrain(const char * configFile, Camera* camera)
 	:m_pCamera(camera)
 {
@@ -30,6 +30,9 @@ void Terrain::render()
 	m_Vao.bind();
 	m_IndexBuffer->bind();
 
+	m_pShader->setUniformMat4f("View", m_pCamera->getViewMatrix());
+	m_pShader->setUniform3f("camera_pos", m_pCamera->getPos());
+
 	_renderRecursive(m_pTerrainTree);
 }
 void Terrain::_createTree(float x, float y, float z, float width, float height)
@@ -45,10 +48,6 @@ void Terrain::_createTree(float x, float y, float z, float width, float height)
 	m_pTerrainTree->tScalePosX = 1.0;
 	m_pTerrainTree->tScalePosZ = 1.0;
 	m_pTerrainTree->parent = m_pTerrainTree;
-	m_pTerrainTree->north = NULL;
-	m_pTerrainTree->south = NULL;
-	m_pTerrainTree->west = NULL;
-	m_pTerrainTree->east = NULL;
 
 	_divideNode(m_pTerrainTree);
 
@@ -78,7 +77,7 @@ bool Terrain::_checkDivide(TerrainNode * node)
 		pow(0.5*node->height, 2.0)
 	);
 
-	return !(distance > 2.5* distance2 || node->width < VMB_TERRAIN_REC_CUTOFF);
+	return !(distance > 3* distance2 || node->width < VMB_TERRAIN_REC_CUTOFF);
 	
 }
 
@@ -87,8 +86,8 @@ GLboolean Terrain::_divideNode(TerrainNode * node)
 	float newWidth = 0.5 * node->width;
 	float newHeight = 0.5 * node->height;
 
-	glm::vec3 position = glm::vec3(m_pCamera->getPos().x,0, m_pCamera->getPos().z);
-	glm::vec3 direction = m_pCamera->getTarget();
+	glm::vec3 camPositionXZ = glm::vec3(m_pCamera->getPos().x,0, m_pCamera->getPos().z);
+	glm::vec3 camDir = m_pCamera->getTarget();
 
 	glm::vec3 childPos[4] =
 	{
@@ -98,92 +97,32 @@ GLboolean Terrain::_divideNode(TerrainNode * node)
 		glm::vec3(node->origin.x - 0.5 * newWidth, node->origin.y, node->origin.z + 0.5 * newHeight)
 	};
 
-	bool c1 = true;
-	bool c2 = true;
-	bool c3 = true;
-	bool c4 = true;
-
-
-	if (node->origin.x < position.x && node->origin.z > position.z)
-	{
-		if (direction.x > 0 && direction.z < 0) 
-		{
-			c4 = false;
-		}	
-	}
-	else if (node->origin.x > position.x && node->origin.z > position.z)
-	{
-		
-		if (direction.x < 0 && direction.z < 0)
-		{
-			
-			c3 = false;
-		}
-	}
-	else if (node->origin.x > position.x && node->origin.z < position.z)
-	{
-
-		if (direction.x < 0 && direction.z > 0)
-		{
-		
-			c2 = false;
-		}
-	}
-	else if (node->origin.x < position.x && node->origin.z < position.z)
-	{
-
-		if (direction.x > 0 && direction.z > 0)
-		{
-			
-			c1 = false;
-		}
-	}
-	
+	bool c1 = !(node->origin.x < camPositionXZ.x && node->origin.z < camPositionXZ.z && camDir.x > 0 && camDir.z > 0);
+	bool c2 = !(node->origin.x > camPositionXZ.x && node->origin.z < camPositionXZ.z && camDir.x < 0 && camDir.z > 0);
+	bool c3 = !(node->origin.x > camPositionXZ.x && node->origin.z > camPositionXZ.z && camDir.x < 0 && camDir.z < 0);
+	bool c4 = !(node->origin.x < camPositionXZ.x && node->origin.z > camPositionXZ.z && camDir.x > 0 && camDir.z < 0);
 	
 
-	
-
-	if(c1)node->child1 = _createNode(node, 1, childPos[0], newWidth, newHeight);
-	if(c2)node->child2 = _createNode(node, 2, childPos[1], newWidth, newHeight);
-	if(c3)node->child3 = _createNode(node, 3, childPos[2], newWidth, newHeight);
-	if(c4)node->child4 = _createNode(node, 4, childPos[3], newWidth, newHeight);
-
-	switch (node->type)
+	if (c1)
 	{
-	case 1:
-		node->east = node->parent->child2;
-		node->north = node->parent->child4;
-		break;
-	case 2:
-		node->west = node->parent->child1;
-		node->north = node->parent->child3;
-		break;
-	case 3:
-		node->south = node->parent->child2;
-		node->west = node->parent->child4;
-		break;
-	case 4:
-		node->south = node->parent->child1;
-		node->east = node->parent->child3;
-		break;
+		node->child1 = _createNode(node, 1, childPos[0], newWidth, newHeight);
+		if(_checkDivide(node->child1)) _divideNode(node->child1);
 	}
-	GLboolean div1, div2, div3, div4;
-	div1 = _checkDivide(node->child1);
-	div2 = _checkDivide(node->child2);
-	div3 = _checkDivide(node->child3);
-	div4 = _checkDivide(node->child4);
-
-	if (div1)
-		_divideNode(node->child1);
-
-	if (div2)
-		_divideNode(node->child2);
-
-	if (div3)
-		_divideNode(node->child3);
-
-	if (div4)
-		_divideNode(node->child4);
+	if (c2)
+	{
+		node->child2 = _createNode(node, 2, childPos[1], newWidth, newHeight);
+		if(_checkDivide(node->child2)) _divideNode(node->child2);
+	}
+	if (c3)
+	{
+		node->child3 = _createNode(node, 3, childPos[2], newWidth, newHeight);
+		if (_checkDivide(node->child3)) _divideNode(node->child3);
+	}
+	if (c4)
+	{
+		node->child4 = _createNode(node, 4, childPos[3], newWidth, newHeight);
+		if (_checkDivide(node->child4)) _divideNode(node->child4);
+	}
 	
 	return true;
 }
@@ -204,21 +143,17 @@ Terrain::TerrainNode * Terrain::_createNode(TerrainNode * parent, int type, glm:
 	m_pTerrainTail->tScalePosX = 1.0f;
 	m_pTerrainTail->tScalePosZ = 1.0f;
 	m_pTerrainTail->parent = parent;
-	m_pTerrainTail->north = NULL;
-	m_pTerrainTail->south = NULL;
-	m_pTerrainTail->east = NULL;
-	m_pTerrainTail->west = NULL;
 
 	return m_pTerrainTail;
 }
-int renderDepth = 0;
+
 void Terrain::_renderRecursive(TerrainNode * node)
 {
 
 	if (!node->child1 && !node->child2 && !node->child3 && !node->child4)
 	{
 		_renderNode(node);
-		renderDepth++;
+		
 		return;
 	}
 
@@ -240,18 +175,8 @@ void Terrain::_renderNode(TerrainNode * node)
 	glm::mat4 g_mvMatrix;
 	glm::mat4 g_mMatrix;
 	g_mMatrix = glm::translate(node->origin);
-	g_mvMatrix = m_pCamera->getViewMatrix() * g_mMatrix;
 
-	m_pShader->setUniformMat4f("mMatrix", g_mMatrix);
-	
-	m_pShader->setUniformMat4f("mvMatrix", g_mvMatrix);
-	
-	// Calc normal Matrix
-	glm::mat3 g_nMatrix = glm::mat3(g_mvMatrix);
-	//g_nMatrix = glm::transpose(g_nMatrix);
-	//g_nMatrix = glm::inverse(g_nMatrix);
-
-	m_pShader->setUniformMat3f("nMatrix", g_nMatrix);
+	m_pShader->setUniformMat4f("World", g_mMatrix);
 
 	// Send the size of the patch to the GPU
 	m_pShader->setUniform1f("tileScale", 0.5*node->width);
@@ -261,7 +186,6 @@ void Terrain::_renderNode(TerrainNode * node)
 	m_pShader->setUniform1f("tscale_negz", node->tScaleNegZ);
 	m_pShader->setUniform1f("tscale_posx", node->tScalePosX);
 	m_pShader->setUniform1f("tscale_posz", node->tScalePosZ);
-	m_pShader->setUniform3f("camera_pos", m_pCamera->getPos());
 
 	GLCall(glDrawElements(GL_PATCHES, 4, GL_UNSIGNED_SHORT, 0));
 }
@@ -272,47 +196,27 @@ void Terrain::_calcTessScale(TerrainNode * node)
 	
 	// Positive Z(north)
 	t = find(m_pTerrainTree, node->origin.x, node->origin.z + 1 + node->width / 2.0);
-	//if (node->child1 == NULL && node->child2 == NULL && node->child3 == NULL && node->child4 == NULL)
-	//	t = node;
-	//else
-	//	t = node->north;
-	if (t->width > node->width)
-		node->tScalePosZ = 2.0;
+	if (t->width < node->width)
+		node->tScalePosZ = node->width / t->width;
 	
 	// Positive X(east)
 	t = find(m_pTerrainTree, node->origin.x + 1 + node->width / 2.0, node->origin.z);
-	//if (node->child1 == NULL && node->child2 == NULL && node->child3 == NULL && node->child4 == NULL)
-	//	t = node;
-	//else
-	//	t = node->east;
-	if (t->width > node->width)
-		node->tScalePosX = 2.0;
+	if (t->width < node->width)
+		node->tScalePosX = node->width / t->width;
 
 	// Negative Z(south)
 	t = find(m_pTerrainTree, node->origin.x, node->origin.z - 1 - node->width / 2.0);
-	//if (node->child1 == NULL && node->child2 == NULL && node->child3 == NULL && node->child4 == NULL)
-	//	t = node;
-	//else
-	//	t = node->south;
-	if (t->width > node->width)
-		node->tScaleNegZ = 2.0;
-
+	if (t->width < node->width)
+		node->tScaleNegZ = node->width / t->width;
 	// Negative X(south)
 	t = find(m_pTerrainTree, node->origin.x - 1 - node->width / 2.0, node->origin.z);
-	//if (node->child1 == NULL && node->child2 == NULL && node->child3 == NULL && node->child4 == NULL)
-	//	t = node;
-	//else
-	//	t = node->west;
-	if (t->width > node->width)
-		node->tScaleNegX = 2.0;
+	if (t->width < node->width)
+		node->tScaleNegX = node->width / t->width;
 }
 
 Terrain::TerrainNode * Terrain::find(TerrainNode * node, float x, float z)
 {
 	if (node->origin.x == x && node->origin.z == z)
-		return node;
-
-	if (node->child1 == NULL && node->child2 == NULL && node->child3 == NULL && node->child4 == NULL)
 		return node;
 
 	if (node->origin.x >= x && node->origin.z >= z && node->child1)
@@ -341,9 +245,8 @@ void Terrain::_initShaders()
 	m_pShader = new Shader(shaders);
 	static const GLfloat aspect = 1280.0f / 720.0f;
 	static const glm::mat4 projection = glm::perspective(70.0f, aspect, 0.01f, 2000000.0f);
-	m_pShader->setUniformMat4f("pMatrix", projection);
-	m_pShader->setUniform2f("Viewport", glm::vec2(1280, 720));
-	m_pShader->setUniform1f("ToggleWireframe", 0.0f);
+	m_pShader->setUniformMat4f("Projection", projection);
+	
 
 }
 void Terrain::_initGraphics()

@@ -31,13 +31,14 @@ main
 		window.getMousePosition(x, y);
 
 		currentCamera->update(x, y);
-
+		static float lol = 0.1f;
+		//lol += 0.01f;
+		//light.move(glm::vec3(std::sin(lol) * 300, 300, std::cos(lol) * 300));
 		terrain.getShader()->setUniform3f("Light_Pos", light.getPosition());
-		terrain.getShader()->setUniform3f("Camera_Pos", currentCamera->getPos());
 
 		light.draw(*currentCamera, projection);
 		light2.draw(*currentCamera, projection);
-		if(GetAsyncKeyState(int('C')))
+		if(!GetAsyncKeyState(int('C')))
 			terrain.update();
 		terrain.render();
 

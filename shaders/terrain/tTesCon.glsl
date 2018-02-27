@@ -3,11 +3,8 @@
 //
 // Uniforms
 //
-uniform	mat4 mMatrix;
-uniform	mat4 pMatrix;
-uniform	mat4 mvMatrix;
-uniform	mat4 mvpMatrix;
-uniform	mat3 nMatrix;
+uniform	mat4 World;
+uniform	mat4 View;
 
 uniform sampler2D TexTerrainHeight;
 uniform float TerrainHeightOffset;
@@ -45,10 +42,10 @@ float dlodCameraDistance(vec4 p0, vec4 p1, vec2 t0, vec2 t1)
 	samp = texture(TexTerrainHeight, t1);
 	p1.y = samp[0] * TerrainHeightOffset;
 
-	vec4 view0 = mvMatrix * p0;
-	vec4 view1 = mvMatrix * p1;
+	vec4 view0 = View * World * p0;
+	vec4 view1 = View * World * p1;
 
-	float MinDepth = 0.0;
+	float MinDepth = 100.0;
 	float MaxDepth = 1024.0;
 
 	float d0 = clamp((abs(view0.z) - MinDepth) / (MaxDepth - MinDepth), 0.0, 1.0);
@@ -89,15 +86,27 @@ void main(void)
 	gl_TessLevelOuter[2] = dlodCameraDistance(gl_in[1].gl_Position, gl_in[2].gl_Position, tcs_terrainTexCoord[1], tcs_terrainTexCoord[2]);
 	gl_TessLevelOuter[3] = dlodCameraDistance(gl_in[2].gl_Position, gl_in[3].gl_Position, tcs_terrainTexCoord[2], tcs_terrainTexCoord[3]);
 
-	// To match the patches with eachother
-	if (tscale_negx == 2.0)
-		gl_TessLevelOuter[0] = max(2.0, gl_TessLevelOuter[0] * 0.5);
-	if (tscale_negz == 2.0)
-		gl_TessLevelOuter[1] = max(2.0, gl_TessLevelOuter[1] * 0.5);
-	if (tscale_posx == 2.0)
-		gl_TessLevelOuter[2] = max(2.0, gl_TessLevelOuter[2] * 0.5);
-	if (tscale_posz == 2.0)
-		gl_TessLevelOuter[3] = max(2.0, gl_TessLevelOuter[3] * 0.5);
+	// To match the patches with eachother, basically just lower the tesselation level to a smaller
+	if (tscale_negx >= 2.0)
+	{
+		gl_TessLevelOuter[0] = min(64.0, gl_TessLevelOuter[0] * tscale_negx);
+		
+	}
+	if (tscale_negz >= 2.0)
+	{
+		gl_TessLevelOuter[1] = min(64.0, gl_TessLevelOuter[1] * tscale_negz);
+		
+	}
+	if (tscale_posx >= 2.0)
+	{
+		gl_TessLevelOuter[2] = min(64.0, gl_TessLevelOuter[2] * tscale_posx);
+	
+	}
+	if (tscale_posz >= 2.0)
+	{
+		gl_TessLevelOuter[3] = min(64.0, gl_TessLevelOuter[3] * tscale_posz);
+	
+	}
 
 	// Inner tessellation level is simply an average of the outer
 	gl_TessLevelInner[0] = 0.5 * (gl_TessLevelOuter[0] + gl_TessLevelOuter[3]);
@@ -109,7 +118,8 @@ void main(void)
 	// Output heightmap coordinates
 	tcs_terrainTexCoord[gl_InvocationID] = vs_terrainTexCoord[gl_InvocationID];
 	tcs_patchTexCoord[gl_InvocationID] = vs_patchTexCoord[gl_InvocationID];
-
+	
+	
 	// Output tessellation level (used for wireframe coloring)
 	tcs_tessLevel[gl_InvocationID] = gl_TessLevelOuter[0];
 }

@@ -28,7 +28,7 @@ Shader * LightBill::getShader()
 
 void LightBill::move(glm::vec3 move)
 {
-	m_Pos += move;
+	m_Pos = move;
 }
 
 void LightBill::draw(Camera camera, glm::mat4 projection)

@@ -3,15 +3,14 @@
 //
 // Uniforms
 //
-uniform	mat4 mMatrix;
-uniform	mat4 pMatrix;
-uniform	mat4 mvMatrix;
-uniform	mat4 mvpMatrix;
-uniform	mat3 nMatrix;
+uniform	mat4 World;
+uniform	mat4 Projection;
+uniform	mat4 View;
 
 uniform float tileScale;
 uniform float TerrainLength;
 uniform float TerrainWidth;
+
 uniform vec3 TerrainOrigin;
 
 //
@@ -32,8 +31,7 @@ vec2 calcTerrainTexCoord(in vec4 pos)
 
 void main(void)
 {
-	// Calcuate texture coordantes (u,v) relative to entire terrain
-	vec4 p = mMatrix * vec4(a_vertex.xyz * tileScale, 1.0);
+	vec4 p = World * vec4(a_vertex.xyz * tileScale, 1.0);
 	vs_terrainTexCoord = calcTerrainTexCoord(p);
 	vs_patchTexCoord = uvs;
 

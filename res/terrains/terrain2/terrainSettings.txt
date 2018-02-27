@@ -1,9 +1,9 @@
 TerrainWidth
-512
+1024
 TerrainHeight
-50
+100
 TerrainLength
-512
+1024
 HeightMap
 res/terrains/terrain2/s.tga
 NormalMap
